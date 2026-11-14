@@ -2,7 +2,14 @@
 const BASE='http://localhost:8790';
 export function createClient(url,key,opts){
  const L=localStorage,uid=()=>L.getItem('fk_uid');
- const auth={async getSession(){const u=uid();return{data:{session:u?{user:{id:u}}:null}}},
+ const auth={async getSession(){const u=uid(),em=L.getItem('fk_email');return{data:{session:u?{user:{id:u,email:em||undefined,is_anonymous:!em}}:null}}},
+  async signInWithOtp(a){const d=await (await fetch(BASE+'/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:a.email})})).json();L.setItem('fk_uid',d.uid);L.setItem('fk_email',d.email);return{data:{},error:null}},
+  async signInWithOAuth(a){window.__oauth=a.provider;return{data:{},error:null}},
+  async signUp(a){const d=await (await fetch(BASE+'/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({op:'signup',email:a.email,password:a.password})})).json();if(d.error)return{data:null,error:d.error};if(d.pending)return{data:{user:{id:'pending'},session:null},error:null};L.setItem('fk_uid',d.uid);L.setItem('fk_email',d.email);return{data:{session:{user:{id:d.uid}}},error:null}},
+  async signInWithPassword(a){const d=await (await fetch(BASE+'/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({op:'signin',email:a.email,password:a.password})})).json();if(d.error)return{data:null,error:d.error};L.setItem('fk_uid',d.uid);L.setItem('fk_email',d.email);return{data:{session:{user:{id:d.uid}}},error:null}},
+  async resetPasswordForEmail(e,o){window.__reset=e;return{data:{},error:null}},
+  async updateUser(a){window.__newpw=a.password;return{data:{},error:null}},
+  async signOut(){L.removeItem('fk_uid');L.removeItem('fk_email');return{error:null}},
   async signInAnonymously(){const d=await (await fetch(BASE+'/auth',{method:'POST'})).json();L.setItem('fk_uid',d.uid);return{data:{user:{id:d.uid}},error:null}}};
  const wait=()=>new Promise(r=>setTimeout(r,window.__rpcDelay||0));
  async function rpc(fn,args){await wait();const r=await fetch(BASE+'/rpc/'+fn,{method:'POST',headers:{'content-type':'application/json','x-uid':uid()},body:JSON.stringify(args)});const d=await r.json();window.__rpcCount=(window.__rpcCount||0)+1;return d.error?{data:null,error:d.error}:{data:d.data,error:null}}

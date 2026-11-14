@@ -12,7 +12,7 @@ def do_import(pg,path):
     with pg.expect_file_chooser() as fc: pg.click('#bl')
     fc.value.set_files(path);pg.wait_for_timeout(900)
 def export(pg):
-    with pg.expect_download() as d: pg.click('#bs')
+    with pg.expect_download() as d: pg.evaluate("dlFile('backup')")   # 서버 설정이 있는 화면에선 저장 버튼이 로그인 창을 열므로 파일 저장 함수를 직접 호출(로그인 제한은 auth 테스트)
     path=tempfile.mktemp(suffix='.json');d.value.save_as(path);return d.value.suggested_filename,path
 def nopos(st):
     f=lambda d:{**{k:v for k,v in d.items() if k not in('x','y','h','base')},**({'o':d.get('o',30),'w':d.get('w',5)} if 'a' in d else {})}

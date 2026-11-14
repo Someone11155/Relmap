@@ -16,6 +16,11 @@ create table if not exists public.rooms (
   created_at timestamptz not null default now()
 );
 
+-- 저장 관련 열: 로그인한 사람이 '저장'하면 owner/title/saved_at 이 채워짐 (이미 만든 DB 에서 다시 실행해도 안전)
+alter table public.rooms add column if not exists owner    uuid;
+alter table public.rooms add column if not exists title    text;
+alter table public.rooms add column if not exists saved_at timestamptz;
+
 create table if not exists public.room_members (
   room      text not null references public.rooms(id) on delete cascade,
   uid       uuid not null,
@@ -127,8 +132,39 @@ begin
   return v_n > 0;
 end $$;
 
-revoke execute on function public.join_room(text), public.apply_ops(text, jsonb), public.seed_room(text) from public, anon;
-grant  execute on function public.join_room(text), public.apply_ops(text, jsonb), public.seed_room(text) to authenticated;
+-- ---- 저장(로그인한 사람만) -------------------------------------------------------
+-- 게스트 = 익명 로그인 사용자(JWT 의 is_anonymous 가 true). 게스트도 방에 들어가 함께 수정할 수 있지만 저장은 못 함.
+create or replace function public.is_guest()
+returns boolean language sql stable set search_path = public as $$
+  select coalesce((auth.jwt() ->> 'is_anonymous')::boolean, true)
+$$;
+
+-- 방을 내 관계도로 저장(처음 저장한 사람이 주인). 다른 사람이 이미 저장한 방은 저장할 수 없음. 이름만 바꿀 때도 사용
+create or replace function public.save_room(p_room text, p_title text)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare v_uid uuid := auth.uid(); v_owner uuid;
+begin
+  if not public.is_member(p_room) then raise exception 'not a member' using errcode = '42501'; end if;
+  if public.is_guest() then raise exception 'login required' using errcode = '42501'; end if;
+  select owner into v_owner from public.rooms where id = p_room for update;
+  if v_owner is not null and v_owner <> v_uid then raise exception 'not owner' using errcode = '42501'; end if;
+  update public.rooms
+     set owner = v_uid, saved_at = now(), title = left(coalesce(nullif(btrim(p_title), ''), '이름 없는 관계도'), 100)
+   where id = p_room;
+  return true;
+end $$;
+
+-- 내가 저장한 관계도 목록 (최근 저장 순)
+create or replace function public.my_rooms()
+returns jsonb language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_agg(jsonb_build_object('id', r.id, 'title', r.title, 'saved_at', r.saved_at) order by r.saved_at desc), '[]'::jsonb)
+    from public.rooms r where r.owner = auth.uid()
+$$;
+
+revoke execute on function public.join_room(text), public.apply_ops(text, jsonb), public.seed_room(text),
+                           public.save_room(text, text), public.my_rooms() from public, anon;
+grant  execute on function public.join_room(text), public.apply_ops(text, jsonb), public.seed_room(text),
+                           public.save_room(text, text), public.my_rooms() to authenticated;
 
 -- ---- Realtime: items 변경을 실시간으로 전달 ---------------------------------------
 alter table public.items replica identity full;
