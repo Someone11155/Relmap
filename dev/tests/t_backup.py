@@ -29,9 +29,9 @@ with sync_playwright() as p:
     f=tempfile.mktemp(suffix='.png');open(f,'wb').write(PNG)
     with A.expect_file_chooser() as fc: A.click('#ins [data-a=img]')
     fc.value.set_files(f);settle(A,800)
-    ok('G2 첨부하면 그룹에 JPEG 이미지가 저장되고 원 안에 배경으로 보임',A.evaluate("g=>nd(g).img.startsWith('data:image/jpeg')&&getComputedStyle(els[g]).backgroundImage.includes('url(')",gid) and A.locator('#ins [data-a=rm]').count()==1)
+    ok('G2 첨부하면 그룹에 JPEG 이미지가 저장되고 원 안에 40% 투명도 배경으로 보임',A.evaluate("g=>nd(g).img.startsWith('data:image/jpeg')&&(q=>q.backgroundImage.includes('url(')&&q.opacity=='0.4')(getComputedStyle(els[g],'::before'))",gid) and A.locator('#ins [data-a=rm]').count()==1)
     A.click('#ins [data-a=rm]');settle(A,300)
-    ok('G3 제거하면 이미지가 없어짐',A.evaluate("g=>!nd(g).img&&!getComputedStyle(els[g]).backgroundImage.includes('url(')",gid))
+    ok('G3 제거하면 이미지가 없어짐',A.evaluate("g=>!nd(g).img&&!els[g].classList.contains('gi')",gid))
     ok('G4 잘못된 그림 값(스크립트·따옴표 섞임)은 걸러냄',A.evaluate("""()=>{const c=(i)=>cleanEnt('n',{t:'c',w:100,h:100,title:'x',col:'#000000',img:i});
       return c('data:image/png;base64,AAAA').img=='data:image/png;base64,AAAA'&&c('data:image/png;base64,AA");x:url(').img===undefined&&c('javascript:alert(1)').img===undefined&&cleanEnt('n',{t:'p',img:'data:image/png,a);b'}).img===''}"""))
     # ── 방 동기화

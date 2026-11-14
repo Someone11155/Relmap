@@ -3,8 +3,8 @@
 #          dev/run.sh collab panel     일부만 (tests/t_<이름>.py)
 # 준비물은 dev/README.md 의 '필요한 것' 참고.
 cd "$(dirname "$0")"
-NAMES=("$@"); [ ${#NAMES[@]} -eq 0 ] && NAMES=(panel overlap mode phys works watch auth collab captcha reconnect race json backup)
-expect(){ case "$1" in panel) echo 13;; overlap) echo 7;; mode) echo 33;; phys) echo 14;; works) echo 19;; watch) echo 21;; auth) echo 31;; collab) echo 16;; captcha) echo 10;; reconnect) echo 12;; json) echo 23;; backup) echo 13;; *) echo "?";; esac; }
+NAMES=("$@"); [ ${#NAMES[@]} -eq 0 ] && NAMES=(panel overlap mode phys works watch auth collab captcha reconnect race json backup multi)
+expect(){ case "$1" in panel) echo 13;; overlap) echo 7;; mode) echo 33;; phys) echo 14;; works) echo 19;; watch) echo 29;; auth) echo 31;; collab) echo 16;; captcha) echo 10;; reconnect) echo 12;; json) echo 23;; backup) echo 13;; multi) echo 10;; *) echo "?";; esac; }
 bash setup_db.sh >/dev/null || { echo "DB 준비 실패 — dev/README.md 의 '필요한 것'을 확인하세요"; exit 2; }
 python3 -m http.server 8765 --directory .. >/dev/null 2>&1 &
 HTTP=$!
