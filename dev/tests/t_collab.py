@@ -49,7 +49,7 @@ with sync_playwright() as p:
     # T10 커서·접속자
     A.mouse.move(500,300);A.mouse.move(700,420,steps=6);settle(B,800)
     ok('T10 B에서 A의 커서와 접속자 2명이 보임',B.locator('.rc').count()==1 and B.locator('#pp .pc').count()==2 and B.eval_on_selector('.rc','e=>e.style.opacity')=='1')
-    A.click('.p[data-id="c"] .im');settle(B,600)
+    A.evaluate("select('c')");settle(B,600)
     ok('T10b A가 선택한 인물에 B 화면 링 표시',B.eval_on_selector('.n[data-id="c"]','e=>e.classList.contains("rs")'))
     # T11 이벤트 유실 → 재접속 시 다시 맞춤
     key=B.evaluate('myKey');api('/ctl',{'drop':{key:True}})
@@ -62,11 +62,5 @@ with sync_playwright() as p:
     pre="try{localStorage.setItem('relmap_v1',JSON.stringify({view:null,nodes:[{id:'zzz',t:'p',x:0,y:0,name:'내 로컬 문서',desc:'',img:'',col:'#0066FF'}],links:[]}))}catch(e){}"
     C=client(b,pre);C.goto(URL+h);settle(C,2000)
     ok('T12 새 접속자는 DB 에 저장된 문서를 받고 자기 로컬 문서가 방을 덮어쓰지 않음',same(C,room=room) and not any(x[0]=='zzz' for x in local(C)['n']) and not any(r['id']=='zzz' for r in api('/dump?room='+room)['data']))
-    # T13 ↻ 정렬 한 번 = 실행 취소 한 칸
-    C.evaluate("const b=nd('b'),c=nd('c');b.x=c.x+20;b.y=c.y+10;upd(b);sv()");settle(C,800);pre_pos=[x for x in local(C)['n'] if x[0]=='b'][0][1]
-    C.click('#bh');C.evaluate("alpha=.04");settle(C,7500)
-    moved=[x for x in local(C)['n'] if x[0]=='b'][0][1]!=pre_pos
-    C.click('#bun');settle(C,1200)
-    ok('T13 ↻ 정렬이 취소 한 번으로 통째로 되돌아가고 DB 에도 반영',moved and [x for x in local(C)['n'] if x[0]=='b'][0][1]==pre_pos and same(C,room=room))
     ok('T14 방 안에서는 로컬 저장본을 건드리지 않음',json.loads(C.evaluate("localStorage.getItem('relmap_v1')"))['nodes'][0]['id']=='zzz')
     print('errors/dialogs:',ERR[:5]); b.close()

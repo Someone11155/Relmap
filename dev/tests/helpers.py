@@ -5,7 +5,7 @@ HERE=os.path.dirname(os.path.abspath(__file__))
 STUBS=os.path.join(HERE,'..','stubs')
 ROOT=os.path.abspath(os.path.join(HERE,'..','..'))
 STUB=open(os.path.join(STUBS,'client_stub.js'),encoding='utf-8').read()
-URL='http://localhost:8765/index.html'; API='http://localhost:8790'
+URL='http://localhost:8765/index.html?mode=edit'; API='http://localhost:8790'
 def api(path,data=None):
     req=urllib.request.Request(API+path,data=json.dumps(data).encode() if data is not None else None,headers={'content-type':'application/json'},method='POST' if data is not None else 'GET')
     return json.loads(urllib.request.urlopen(req).read())

@@ -1,0 +1,60 @@
+from helpers import *
+# 작품(영화·드라마) 목록 + 인물·선 태그 (편집 모드), 읽기 모드 표시, 검증, 방 동기화
+BASE='http://localhost:8765/index.html'
+EDIT=BASE+'?mode=edit'
+vis=lambda pg,s:pg.eval_on_selector(s,'e=>getComputedStyle(e).display')!='none'
+W=lambda pg:pg.evaluate("WK().map(w=>[w.title,w.kind,w.n||0])")
+tg=lambda pg,i:pg.evaluate("i=>(obj(i).tg||[]).slice().sort()",i)
+def mk(b):
+    pg=b.new_context(viewport={'width':1280,'height':760}).new_page();pg.on('pageerror',lambda e:ERR.append(str(e)));pg.on('dialog',lambda d:(ERR.append('DIALOG:'+d.message),d.accept()));return pg
+with sync_playwright() as p:
+    b=p.chromium.launch();pg=mk(b)
+    pg.goto(EDIT);settle(pg,700)
+    ok('W1 편집 모드에서 작품 버튼으로 목록 창을 열고 닫을 수 있음',pg.is_visible('#bw') and not vis(pg,'#wk') and (pg.click('#bw') or vis(pg,'#wk')) and (pg.click('[data-wa=x]') or not vis(pg,'#wk')))
+    pg.click('#bw');pg.click('[data-wa=m]');pg.keyboard.type('영화1');pg.click('[data-wa=s]');pg.keyboard.type('드라마1')
+    pg.locator('[data-wn]').fill('5');pg.keyboard.press('Tab');settle(pg,200)
+    ok('W2 영화·드라마를 추가하고 이름·에피소드 수를 바꿀 수 있음',W(pg)==[['영화1','m',0],['드라마1','s',5]])
+    mid,sid=pg.evaluate("WK().map(w=>w.id)")
+    pg.click('#bf');settle(pg,300)
+    ok('W3 작품은 화면에 그려지지 않고 전체 보기도 정상',pg.locator('.n.w').count()==0 and pg.evaluate("S.nodes.filter(n=>n.t=='w').length")==2 and not ERR)
+    pg.click('#bw');pg.click('.n.p[data-id="b"] .im');settle(pg,200)
+    pg.check(f'[data-tg="{mid}"]');pg.click(f'[data-tgx="{sid}"]');settle(pg,100)
+    ok('W4 인물 패널에 작품 체크 목록, 드라마를 펼치면 에피소드(5개)가 보임',pg.locator('#ins .eps input').count()==5 and tg(pg,'b')==[mid])
+    pg.check(f'[data-tg="{sid}_2"]');pg.check(f'[data-tg="{sid}_3"]')
+    ok('W5 에피소드를 하나씩 체크하면 태그에 저장되고 드라마는 중간 상태(2/5)로 표시',tg(pg,'b')==sorted([mid,sid+'_2',sid+'_3']) and pg.evaluate("document.querySelector('[data-tgw]').indeterminate") and '(2/5)' in pg.inner_text(f'[data-tgx="{sid}"]'))
+    pg.click('[data-tgw]');settle(pg,100)
+    ok('W6 드라마 체크박스를 누르면 모든 에피소드가 체크됨',len(tg(pg,'b'))==6)
+    pg.click('[data-tgw]');settle(pg,100)
+    ok('W7 다시 누르면 모든 에피소드가 해제됨',tg(pg,'b')==[mid])
+    pg.evaluate("select('l1')");settle(pg,100);pg.check(f'[data-tg="{mid}"]')
+    ok('W8 관계선에도 같은 방식으로 태그를 붙일 수 있음',tg(pg,'l1')==[mid])
+    pg.evaluate("select('b')");settle(pg,100);pg.check(f'[data-tg="{sid}_4"]');pg.check(f'[data-tg="{sid}_5"]')
+    pg.click('#bw');pg.locator('[data-wn]').fill('3');pg.keyboard.press('Tab');settle(pg,200)
+    ok('W9 에피소드 수를 줄이면 범위 밖 태그가 정리됨',tg(pg,'b')==[mid] and pg.evaluate("WK()[1].n")==3)
+    pg.click(f'[data-wd="{mid}"]');pg.click(f'[data-wd="{mid}"]');settle(pg,200)
+    ok('W10 작품을 지우면(두 번 확인) 인물·선의 태그도 함께 정리됨',W(pg)==[['드라마1','s',3]] and tg(pg,'b')==[] and tg(pg,'l1')==[])
+    pg.click('[data-wa=m]');pg.keyboard.type('영화2');pg.click('[data-wa=x]');settle(pg,100)
+    m2=pg.evaluate("WK().find(w=>w.title=='영화2').id");pg.evaluate("select('b')");settle(pg,100);pg.check(f'[data-tg="{m2}"]')
+    pg.click('#bm');settle(pg,300)
+    pg.evaluate("WS.add(WK().find(w=>w.title=='영화2').id);drawLinks()")   # 읽기 모드는 본 작품만 보이므로 영화2를 본 것으로
+    pg.click('.n.p[data-id="b"] .im');settle(pg,200)
+    ok('W11 읽기 모드: 작품 버튼은 없고 인물 프로필에 등장 작품이 글자로 보임',not pg.is_visible('#bw') and '등장: 영화2' in pg.inner_text('#ins'))
+    r=pg.evaluate("""()=>{const d=cleanDoc({nodes:[{id:'p1',t:'p',x:0,y:0,name:'a',tg:['ok','bad id','__proto__','ok']},{id:'w1',t:'w',kind:'zzz',n:99999,title:'x'.repeat(500),ord:'abc'},{id:'w2',t:'w',kind:'s',n:-5}],links:[{id:'l',a:'p1',b:'p1',tg:'notarray'}]});
+      return {tg:d.nodes[0].tg,k:d.nodes[1].kind,n1:d.nodes[1].n,t:d.nodes[1].title.length,o:d.nodes[1].ord,n2:d.nodes[2].n,ltg:d.links[0].tg}}""")
+    ok('W12 불러온 파일의 잘못된 작품·태그 값은 걸러짐(이상한 id·종류·개수·길이)',r=={'tg':['ok'],'k':'m','n1':None,'t':100,'o':0,'n2':1,'ltg':None})
+    r2=pg.evaluate("""()=>{const d=cleanDoc(JSON.parse(JSON.stringify({nodes:S.nodes,links:S.links})));return [d.nodes.filter(n=>n.t=='w').map(w=>w.title+w.kind+(w.n||'')).sort(),d.nodes.find(n=>n.id=='b').tg]}""")
+    ok('W13 저장·불러오기(JSON) 왕복에서 작품과 태그가 유지됨',r2[0]==sorted(['드라마1s3','영화2m']) and len(r2[1])==1)
+    # ── 방 안: 작품·태그가 동기화되고 읽기 모드 사용자에게도 보임
+    A=client(b,"");B=client(b,"")
+    A.goto(EDIT);settle(A,500);A.click('#bk');settle(A,1500);h=A.evaluate('location.hash');room=h.split('room=')[1]
+    B.goto(BASE+h);settle(B,1800)
+    A.click('#bw');A.click('[data-wa=m]');A.keyboard.type('방영화');A.click('[data-wa=x]');settle(A,300)
+    A.click('.n.p[data-id="b"] .im');settle(A,200);A.check('#ins [data-tg]');settle(A,1500)
+    B.evaluate("WS.add(WK()[0].id);drawLinks()");B.click('.n.p[data-id="b"] .im');settle(B,300)
+    ok('R1 방 안에서 만든 작품·태그가 서버를 거쳐 읽기 모드 화면에도 보임',same(A,B,room=room) and B.evaluate("WK().length")==1 and '등장: 방영화' in B.inner_text('#ins'))
+    A.click('#bw');A.click('[data-wd]');A.click('[data-wd]');settle(A,1500)
+    ok('R2 작품을 지우면 방 전체에서 사라지고 태그도 정리됨',same(A,B,room=room) and B.evaluate("WK().length")==0 and tg(B,'b')==[])
+    A.click('[data-wa=s]');A.keyboard.type('방드라마');A.click('[data-wa=x]');settle(A,1200);A.click('#bun');settle(A,1500)
+    ok('R3 방 안에서 작품 추가도 실행 취소 한 번으로 되돌아가고 서버에도 반영',A.evaluate("WK().length")==0 and same(A,B,room=room))
+    ok('Z 페이지 오류·예상 못한 대화상자 없음',not ERR)
+    b.close()

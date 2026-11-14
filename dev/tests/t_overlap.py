@@ -1,6 +1,6 @@
 import time
 from playwright.sync_api import sync_playwright
-URL='http://localhost:8765/index.html'
+URL='http://localhost:8765/index.html?mode=edit'
 ok=lambda n,v:print(('PASS ' if v else 'FAIL ')+n)
 def lab(pg,text): return pg.locator('.lb',has_text=text)
 def op(pg,text): return float(pg.evaluate("t=>{const e=[...document.querySelectorAll('.lb')].find(x=>x.textContent==t);return getComputedStyle(e).opacity}",text))

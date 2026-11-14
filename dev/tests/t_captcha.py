@@ -4,7 +4,7 @@ import os, tempfile
 HERE=os.path.dirname(os.path.abspath(__file__))
 STUB=open(os.path.join(HERE,'..','stubs','client_stub_cap.js'),encoding='utf-8').read()
 ROOT=os.path.abspath(os.path.join(HERE,'..','..'))
-URL='http://localhost:8765/index.html'
+URL='http://localhost:8765/index.html?mode=edit'
 TSJS="window.turnstile={render(el,o){window.__tsRendered=(window.__tsRendered||0)+1;window.__tsOpts=o;setTimeout(()=>{if(window.__tsFail)o['error-callback'](window.__tsFail);else o.callback('tok-123')},window.__tsDelay||150);return 'w1'},remove(){window.__tsRemoved=1},reset(){}};"
 def fulfiller(body,ct='application/javascript'): return lambda r,req=None:r.fulfill(status=200,content_type=ct,body=body)
 def mk(b,cfg,need=True,ts='ok',extra=''):
