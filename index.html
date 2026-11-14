@@ -120,7 +120,7 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
 #wk input[type=text]{flex:1}#wk input[type=number]{width:62px}
 #dl input[type=text],#dl input[type=email],#dl input[type=password]{display:block;width:100%;margin-bottom:10px}
 #wk input:focus-visible,#dl input:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--acc)}
-@media (max-width:640px){#wk,#dl{left:8px;right:8px;width:auto;top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));max-height:55%}}
+@media (max-width:640px){#wk,#dl{left:8px;right:8px;width:auto}}
 /* 로그인·가입·새 비밀번호: 화면 전체를 쓰는 새 화면 (Wanted 디자인 시스템: 파랑 하나, 낮은 그림자) */
 #dl.full{position:fixed;inset:0;left:0;right:0;top:0;bottom:0;width:auto;max-height:none;border-radius:0;box-shadow:none;background:var(--bg);padding:0;z-index:2000001;display:none}
 #dl.full .au{box-sizing:border-box;min-height:100%;max-width:400px;margin:0 auto;padding:max(48px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-left,0px)) max(32px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;justify-content:center}
@@ -166,6 +166,7 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-move" viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></symbol>
 </svg>
 <div id="cv">
   <div id="w"><svg id="ln"></svg><div id="oc"></div></div>
@@ -176,7 +177,7 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
     <span class="sp"></span>
     <button id="bk"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span class="bt">공동 편집</span></button><span id="pp"></span><button id="bx" class="ib" hidden title="공동 편집 끝내기" aria-label="공동 편집 끝내기"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     <span class="sp"></span>
-    <button id="bs" title="관계도를 JSON 파일로 저장"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg><span class="bt">저장</span></button><button id="bl" title="JSON 파일에서 관계도 불러오기"><svg class="ic" aria-hidden="true"><use href="#i-folder"/></svg><span class="bt">불러오기</span></button><button id="br" class="ed">초기화</button><span class="sp"></span><button id="ba" hidden title="로그인 / 내 계정"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span class="bt">로그인</span></button>
+    <button id="bs" title="관계도를 JSON 파일로 저장"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg><span class="bt">저장</span></button><button id="bl" title="JSON 파일에서 관계도 불러오기"><svg class="ic" aria-hidden="true"><use href="#i-folder"/></svg><span class="bt">불러오기</span></button><button id="bb" class="ed" title="자동 백업에서 되돌리기"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><span class="bt">백업</span></button><button id="br" class="ed">초기화</button><span class="sp"></span><button id="ba" hidden title="로그인 / 내 계정"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span class="bt">로그인</span></button>
   </div>
   <div id="ins"></div>
   <div id="wk"></div>
@@ -213,7 +214,7 @@ function upd(n){if(n.t=='w')return;CB.q();const e=els[n.id],s=e.style;s.left=n.x
  if(n.t=='p'){ovq();const i=e.children[0];i.style.backgroundImage=n.img?`url(${n.img})`:'none';i.style.backgroundColor=n.col;i.textContent=n.img?'':(n.name||'?').trim().charAt(0);
   e.querySelector('.nm').textContent=n.name;e.querySelector('.ds').textContent=n.desc}
  if(n.t=='t'){e.textContent=n.text||'텍스트';s.fontSize=n.size+'px';s.fontWeight=n.bold?700:400;s.color=n.col||'';s.letterSpacing=trk(n.size)+'em'}
- if(n.t=='c'){s.width=n.w+'px';s.height=n.h+'px';s.borderColor=n.col;s.background=`color-mix(in srgb,${n.col} ${n.op}%,transparent)`;const ct=e.children[0];ct.textContent=n.title;ct.style.color=`color-mix(in srgb,${n.col} 75%,var(--ink))`;{const fs=Math.max(12,Math.min(n.w,n.h)*.06);ct.style.fontSize=fs+'px';ct.style.letterSpacing=trk(fs)+'em'}ct.style.top=n.h*.1+'px'}}
+ if(n.t=='c'){s.width=n.w+'px';s.height=n.h+'px';s.borderColor=n.col;{const f=`color-mix(in srgb,${n.col} ${n.op}%,transparent)`;s.background=n.img?`linear-gradient(${f},${f}),url("${n.img}") center/cover`:f}const ct=e.children[0];ct.textContent=n.title;ct.style.color=`color-mix(in srgb,${n.col} 75%,var(--ink))`;{const fs=Math.max(12,Math.min(n.w,n.h)*.06);ct.style.fontSize=fs+'px';ct.style.letterSpacing=trk(fs)+'em'}ct.style.top=n.h*.1+'px'}}
 const ctr=n=>n.t=='p'?[n.x+42+(n._dx||0),n.y+42+(n._dy||0)]:[n.x,n.y];
 function drawLinks(){applyVis();let h='';const pk=x=>x.a<x.b?x.a+'|'+x.b:x.b+'|'+x.a,GM={};S.links.forEach(l=>(GM[pk(l)]=GM[pk(l)]||[]).push(l));
  S.links.forEach(l=>{const a=nd(l.a),b=nd(l.b);if(!a||!b)return;if(HID.has(l.id)){if(lels[l.id])lels[l.id].style.display='none';return}const[c1,c2]=[ctr(a),ctr(b)],on=sel==l.id,hv=hov&&(l.a==hov||l.b==hov),op=Math.min(1,(l.o??30)/100*(hov&&!hv?.35:1)+(on||hv?.3:0)),d=Math.hypot(c2[0]-c1[0],c2[1]-c1[1])||1,ux=(c2[0]-c1[0])/d,uy=(c2[1]-c1[1])/d,dr=l.dir||'to',fw=dr=='to'||dr=='both',bw=dr=='from'||dr=='both',hl=12+l.w*1.5,hw=5+l.w*1.1,g=GM[pk(l)],oo=(g.indexOf(l)-(g.length-1)/2)*Math.min(30,84/Math.max(1,g.length-1))*(l.a<l.b?1:-1),hh=Math.sqrt(Math.max(0,2304-oo*oo)),p=[c1[0]+ux*hh-uy*oo,c1[1]+uy*hh+ux*oo],q=[c2[0]-ux*hh-uy*oo,c2[1]-uy*hh+ux*oo],x1=p[0]+(bw?ux*hl:0),y1=p[1]+(bw?uy*hl:0),x2=q[0]-(fw?ux*hl:0),y2=q[1]-(fw?uy*hl:0),tri=(T,vx,vy)=>`<polygon points="${T[0]},${T[1]} ${T[0]-vx*hl-vy*hw},${T[1]-vy*hl+vx*hw} ${T[0]-vx*hl+vy*hw},${T[1]-vy*hl-vx*hw}" fill="${esc(l.col)}" fill-opacity="${op}"/>`;
@@ -253,9 +254,9 @@ function endConn(){connMode=false;conn=null;cv.classList.remove('cm');$('#bc').c
 function startConn(){connMode=true;conn=nd(sel)?.t=='p'?sel:null;cv.classList.add('cm');$('#bc').classList.add('on');$('#bc .bt').textContent='연결할 인물 두 명 클릭';if(conn)els[conn].classList.add('sel2')}
 
 /* 이미지 */
-function readImg(f){return new Promise(r=>{const im=new Image();im.onload=()=>{const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=256;
+function readImg(f,big){return new Promise(r=>{const im=new Image();im.onload=()=>{if(big){const k=Math.min(1,640/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(im.src);r(c.toDataURL('image/jpeg',.82));return}const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=256;
  c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)*.25,s,s,0,0,256,256);URL.revokeObjectURL(im.src);r(c.toDataURL('image/jpeg',.85))};im.src=URL.createObjectURL(f)})}
-function pickImg(n){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){n.img=await readImg(f.files[0]);upd(n);sv();if(sel==n.id)panel()}};f.click()}
+function pickImg(n){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){n.img=await readImg(f.files[0],n.t=='c');upd(n);sv();if(sel==n.id)panel()}};f.click()}
 cv.addEventListener('dragover',e=>e.preventDefault());
 cv.addEventListener('drop',e=>{e.preventDefault();if(mode!='e')return;const r=cv.getBoundingClientRect(),v=S.view;
  [...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')).forEach(async(f,i)=>{const d=await readImg(f);
@@ -295,7 +296,14 @@ function renderWk(){const st=wk.scrollTop;
  else wk.innerHTML='<h3>작품</h3>'+(WK().map(w=>`<div class="wr"><span>${w.kind=='s'?'드라마':'영화'}</span><input type="text" data-wt="${esc(w.id)}" value="${esc(w.title)}" maxlength="100">${w.kind=='s'?`<input type="number" min="1" max="500" data-wn="${esc(w.id)}" value="${w.n||1}" title="에피소드 수"><span>화</span>`:''}<button class="danger" data-wd="${esc(w.id)}">삭제</button></div>`
   +(w.kind=='s'?`<div class="tg"><button data-wex="${esc(w.id)}">${wxOpen.has(w.id)?'▾':'▸'} 에피소드 이름</button></div>`+(wxOpen.has(w.id)?'<div class="wn">'+Array.from({length:w.n||1},(_,k)=>`<input type="text" data-we="${esc(w.id)}" data-i="${k}" placeholder="${k+1}화" value="${esc((w.en&&w.en[k])||'')}" maxlength="100">`).join('')+'</div>':''):'')).join('')||'<label>아직 작품이 없어요. 아래에서 영화나 드라마를 추가하세요.</label>')+'<div class="row"><button data-wa="m">+ 영화</button><button data-wa="s">+ 드라마</button><button data-wa="x">닫기</button></div>';
  wk.scrollTop=st}
-function wkShow(v){if(v)dlShow('');wk.style.display=v?'block':'none';$('#bw').classList.toggle('on',v);$('#bq').classList.toggle('on',v);if(v)renderWk()}
+/* 상단바 버튼을 누르면 그 버튼 바로 아래에 드롭다운으로 뜸(화면 밖으로 안 나가게 좌우를 맞추고, 높이는 남은 공간까지) */
+function place(el,btn){if(!btn||el.style.display!='block'||el.classList.contains('full')){el.style.left=el.style.right=el.style.top=el.style.maxHeight='';return}
+ const r=btn.getBoundingClientRect(),c=cv.getBoundingClientRect(),top=Math.max(8,r.bottom-c.top+8);
+ if(innerWidth>640){el.style.left=clamp(r.left-c.left,8,Math.max(8,c.width-el.offsetWidth-8))+'px';el.style.right='auto'}else el.style.left=el.style.right='';
+ el.style.top=top+'px';el.style.maxHeight=Math.max(120,c.height-top-12)+'px'}
+const wkBtn=()=>$(mode=='r'?'#bq':'#bw'),dlBtn=()=>$(dlKind=='save'?'#bs':dlKind=='share'?'#bk':dlKind=='auto'?'#bb':'#ba');
+addEventListener('resize',()=>{place(wk,wkBtn());place(dl,dlBtn())});
+function wkShow(v){if(v)dlShow('');wk.style.display=v?'block':'none';$('#bw').classList.toggle('on',v);$('#bq').classList.toggle('on',v);if(v){renderWk();place(wk,wkBtn())}}
 const wkRef=()=>{if(wk.style.display=='block'&&!wk.contains(document.activeElement))renderWk()};
 $('#bw').onclick=$('#bq').onclick=()=>wkShow(wk.style.display!='block');
 wk.addEventListener('input',e=>{const d=e.target.dataset;if(d.we){const w=nd(d.we);if(!w)return;const en=Array.from({length:w.n||1},(_,k)=>(w.en&&w.en[k])||'');en[+d.i]=e.target.value.slice(0,100);w.en=en;sv();return}const w=nd(d.wt);if(!w)return;w.title=e.target.value.slice(0,100);sv()});
@@ -322,7 +330,7 @@ function panel(){CB.ge('p');const o=obj(sel);if(!o){ins.style.display='none';ret
  let h='';
  if(o.t=='p')h=`<h3>인물</h3>${T('name','이름')}${A('desc','설명')}<div class="row"><button data-a="img">이미지 첨부</button>${o.img?'<button data-a="rm">이미지 제거</button>':''}</div>${C('col','대표 색')}${B('pin','위치 고정')}${rel(o)}${tags(o)}<div class="row"><button data-a="conn"><svg class="ic" aria-hidden="true"><use href="#i-link"/></svg>선 연결</button></div>`;
  else if(o.t=='t')h=`<h3>텍스트</h3>${A('text','내용')}${R('size','크기',10,160)}${B('bold','굵게')}${C('col','색')}`;
- else if(o.t=='c')h=`<h3>원</h3>${T('title','제목')}${C('col','색')}${R('op','채움 농도',4,50)}<label>인물을 원 안에 놓으면 멤버가 됩니다. 원을 끌면 멤버가 함께 움직이고, 크기는 모서리 점을 끌어 조절합니다.</label>${memList(o)}`;
+ else if(o.t=='c')h=`<h3>원</h3>${T('title','제목')}${C('col','색')}${R('op','채움 농도',4,50)}<div class="row"><button data-a="img">배경 이미지 첨부</button>${o.img?'<button data-a="rm">배경 이미지 제거</button>':''}</div><label>인물을 원 안에 놓으면 멤버가 됩니다. 원을 끌면 멤버가 함께 움직이고, 크기는 모서리 점을 끌어 조절합니다.</label>${memList(o)}`;
  else h=`<h3>관계선</h3>${T('label','설명')}<label>방향<select data-k="dir">${[['to','→'],['from','←'],['both','↔'],['none','—']].map(([v,s])=>`<option value="${v}" ${(o.dir||'to')==v?'selected':''}>${esc(nd(o.a)?.name)} ${s} ${esc(nd(o.b)?.name)}</option>`).join('')}</select></label>${C('col','색')}${R('w','굵기',1,14)}${R('o','투명도',10,100)}${B('dash','점선')}${tags(o)}<div class="row"><button data-a="swap"><svg class="ic" aria-hidden="true"><use href="#i-swap"/></svg>방향 바꾸기</button><button data-a="dup"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>선 추가</button></div>`;
  ins.innerHTML=h+`<div class="row"><button class="danger" data-a="del">삭제</button></div>`;ins.querySelectorAll('[data-tgw]').forEach(x=>x.indeterminate=+x.dataset.c>0&&+x.dataset.c<+x.dataset.n)}
 ins.addEventListener('input',e=>{const t=e.target,k=t.dataset.k;if(!k)return;const o=obj(sel);o[k]=t.type=='checkbox'?t.checked:t.type=='range'?+t.value:t.value;nd(sel)?upd(o):drawLinks();sv()});
@@ -368,7 +376,7 @@ $('#zi').onclick=()=>zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);
 $('#zo').onclick=()=>zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);
 $('#bf').onclick=fit;
 let rt=0;$('#br').onclick=()=>{const b=$('#br');if(!rt){b.textContent='정말 삭제하시겠습니까?';b.classList.add('danger');rt=setTimeout(()=>{rt=0;b.textContent='초기화';b.classList.remove('danger')},3000);return}
- clearTimeout(rt);rt=0;b.textContent='초기화';b.classList.remove('danger');S={view:S.view,ph:S.ph,nodes:[],links:[]};W.querySelectorAll('.n,.lb').forEach(x=>x.remove());els={};lels={};select(null);sv()};
+ clearTimeout(rt);rt=0;b.textContent='초기화';b.classList.remove('danger');bkSnap(true);S={view:S.view,ph:S.ph,nodes:[],links:[]};W.querySelectorAll('.n,.lb').forEach(x=>x.remove());els={};lels={};select(null);sv()};
 
 /* 모드: r=읽기(기본, 보기만) / e=편집 / m=이동(편집 화면 그대로, 요소는 못 만지고 화면 이동·확대만) */
 function setMode(m){if(S.lock&&!room&&m!='r')m='r';if(m==mode)return;const was=mode;mode=m;endConn();drag=null;
@@ -469,17 +477,17 @@ function fromA(a){const C={blue:'#0066ff',violet:'#6541f2',cyan:'#007c90',green:
 /* 저장 / 불러오기 */
 const flash=(b,t)=>{const l=b.querySelector('.bt'),o=l.dataset.o||(l.dataset.o=l.textContent);l.textContent=t;setTimeout(()=>l.textContent=o,1800)};
 /* 데이터 검증: 다른 참가자·불러온 파일의 값은 믿지 않고, 알려진 필드만 형식을 맞춰서 씀 (화면 마크업에 값이 들어가므로 필수) */
-const HEX=/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i,idOk=i=>typeof i=='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(i)&&!(i in Object.prototype);
+const IMG=/^data:image\/[\w.+-]+;base64,[A-Za-z0-9+\/=]+$/,HEX=/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i,idOk=i=>typeof i=='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(i)&&!(i in Object.prototype);
 const TG=a=>[...new Set(a.filter(idOk))].slice(0,300),nm=(v,d,a,b)=>{v=+v;return Number.isFinite(v)?Math.min(b,Math.max(a,v)):d},tx=(v,n)=>typeof v=='string'?v.slice(0,n):'';
 function cleanEnt(k,d){if(!d||typeof d!='object'||Array.isArray(d))return null;const r={};
  if(k=='l'){if(!idOk(d.a)||!idOk(d.b))return null;r.a=d.a;r.b=d.b;r.label=tx(d.label,300);r.col=HEX.test(d.col)?d.col:'#70737C';r.w=nm(d.w,5,1,14);r.o=nm(d.o,30,10,100);
   if(['to','from','both','none'].includes(d.dir))r.dir=d.dir;if(typeof d.dash=='boolean')r.dash=d.dash;if(Array.isArray(d.tg))r.tg=TG(d.tg);return r}
  const t=d.t;if(t!='p'&&t!='t'&&t!='c'&&t!='w')return null;r.t=t;r.x=nm(d.x,0,-1e6,1e6);r.y=nm(d.y,0,-1e6,1e6);
- if(t=='p'){r.name=tx(d.name,200);r.desc=tx(d.desc,5000);r.img=typeof d.img=='string'&&/^data:image\//.test(d.img)&&d.img.length<=1500000?d.img:'';r.col=HEX.test(d.col)?d.col:'#0066FF';if(typeof d.pin=='boolean')r.pin=d.pin;if(Array.isArray(d.tg))r.tg=TG(d.tg)}
+ if(t=='p'){r.name=tx(d.name,200);r.desc=tx(d.desc,5000);r.img=typeof d.img=='string'&&IMG.test(d.img)&&d.img.length<=1500000?d.img:'';r.col=HEX.test(d.col)?d.col:'#0066FF';if(typeof d.pin=='boolean')r.pin=d.pin;if(Array.isArray(d.tg))r.tg=TG(d.tg)}
  else if(t=='w'){r.title=tx(d.title,100);r.kind=d.kind=='s'?'s':'m';if(r.kind=='s'){r.n=Math.round(nm(d.n,1,1,500));if(Array.isArray(d.en))r.en=d.en.slice(0,r.n).map(x=>tx(x,100))}r.ord=nm(d.ord,0,0,1e15)}
  else if(t=='t'){r.text=tx(d.text,5000);r.size=nm(d.size,22,6,400);r.bold=!!d.bold;r.col=d.col===''||HEX.test(d.col)?d.col:''}
  else{r.w=nm(d.w,420,40,20000);r.h=nm(d.h,420,40,20000);r.title=tx(d.title,200);r.col=HEX.test(d.col)?d.col:'#0066FF';r.op=nm(d.op,8,0,100);
-  if(Array.isArray(d.m))r.m=d.m.filter(idOk).slice(0,2000);if(typeof d.ph=='boolean')r.ph=d.ph}
+  if(typeof d.img=='string'&&IMG.test(d.img)&&d.img.length<=1500000)r.img=d.img;if(Array.isArray(d.m))r.m=d.m.filter(idOk).slice(0,2000);if(typeof d.ph=='boolean')r.ph=d.ph}
  return r}
 /* 파일 전체 검증: 잘못된 id(너무 길거나 이상한 글자·중복)는 새 id 로 바꾸고 선·그룹 멤버의 참조도 함께 바꿈 */
 function cleanDoc(d){if(!d||!Array.isArray(d.nodes)||!Array.isArray(d.links)||d.nodes.length>5000||d.links.length>10000)throw 0;
@@ -494,16 +502,26 @@ function dlFile(kind){kind=kind||'backup';const b=$('#bs');try{
  const url=URL.createObjectURL(new Blob([txt],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='인물관계도_'+(kind=='share'?'감상용_':'')+new Date().toLocaleDateString('sv-SE')+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);flash(b,'저장 완료')}
  catch(e){console.error(e);flash(b,'저장 실패')}}
 /* JSON 불러오기: 공동 편집 중이면 방 전체가 파일 내용으로 바뀌므로 확인을 받고, 실행 취소 한 번으로 되돌릴 수 있게 한 덩어리로 기록 */
+/* 문서 통째로 교체(파일 불러오기·자동 백업 복원 공용). 바꾸기 전 모습은 자동 백업에 보관 */
+function useDoc(d,share,b,what){const live=room&&ready;
+ if(live&&mode!='e'){msg('편집 모드에서만 방의 관계도를 변경할 수 있습니다.');return false}
+ if(live&&!confirm('이 방의 관계도 전체가 '+what+'의 내용으로 바뀌며, 참여 중인 모든 사용자에게 표시됩니다.\n\n계속하시겠습니까?'))return false;
+ bkSnap(true);if(live){diff();hclose()}
+ S={view:null,ph:d.ph,nodes:d.nodes,links:d.links};if(share&&!live)S.lock=true;W.querySelectorAll('.n,.lb').forEach(x=>x.remove());els={};lels={};hov=null;
+ migrate();S.nodes.forEach(mk);select(null);fit();phb();heat(.4);sv();if(live)diff();lockUi();flash(b,'불러옴');return true}
 $('#bl').onclick=()=>{const f=document.createElement('input');f.type='file';f.accept='.json,application/json';
  f.onchange=async()=>{const file=f.files[0];if(!file)return;const b=$('#bl');
-  try{if(file.size>30e6)throw 0;let d=JSON.parse(await file.text());const share=!!d&&d.kind=='share';if(Array.isArray(d.edges))d=fromA(d);d=cleanDoc(d);
-   const live=room&&ready;
-   if(live&&mode!='e'){msg('편집 모드에서만 방의 관계도를 변경할 수 있습니다.');return}
-   if(live&&!confirm('이 방의 관계도 전체가 이 파일의 내용으로 바뀌며, 참여 중인 모든 사용자에게 표시됩니다.\n\n계속하시겠습니까?'))return;
-   if(live){diff();hclose()}
-   S={view:null,ph:d.ph,nodes:d.nodes,links:d.links};if(share&&!live)S.lock=true;W.querySelectorAll('.n,.lb').forEach(x=>x.remove());els={};lels={};hov=null;
-   migrate();S.nodes.forEach(mk);select(null);fit();phb();heat(.4);sv();if(live)diff();lockUi();flash(b,'불러옴')}
+  try{if(file.size>30e6)throw 0;let d=JSON.parse(await file.text());const share=!!d&&d.kind=='share';if(Array.isArray(d.edges))d=fromA(d);d=cleanDoc(d);useDoc(d,share,b,'이 파일')}
   catch(e){flash(b,'올바른 파일이 아닙니다')}};f.click()};
+/* 자동 백업: 바뀐 내용이 있으면 5분마다, 그리고 통째로 바꾸기(불러오기·초기화·복원) 직전에 최근 5개를 이 브라우저에 보관. 방마다 따로.
+   shortcut: localStorage(약 5MB)라 이미지가 많으면 오래된 것부터 줄어듦, 더 필요하면 IndexedDB 로 */
+const BKK=()=>'relmap_auto_bk_'+(rid||'local'),bkList=()=>{try{const a=JSON.parse(lsGet(BKK()));return Array.isArray(a)?a:[]}catch(e){return[]}};
+function bkSnap(force){if(room&&!ready||S.lock||!S.nodes.some(n=>n.t!='w'))return;
+ const d=JSON.stringify({ph:S.ph,nodes:S.nodes,links:S.links},(k,v)=>(k=='view'||k=='vx'||k=='vy'||k=='fx'||k=='fy'||k[0]=='_')?undefined:v),a=bkList(),l=a[0];
+ if(l&&(l.d==d||!force&&Date.now()-l.t<3e5))return;
+ a.unshift({t:Date.now(),n:S.nodes.filter(x=>x.t=='p').length,l:S.links.length,d});a.length=Math.min(a.length,5);
+ for(;a.length;a.pop()){try{localStorage.setItem(BKK(),JSON.stringify(a));return}catch(e){}}}
+setInterval(()=>bkSnap(),6e4);
 
 /* 공동 편집 (Supabase) — 방 하나 = 문서 하나.
    문서(인물·선)는 Postgres 표(items)에 저장되고, 바뀐 행이 Realtime 으로 모두에게 전달됩니다.
@@ -687,8 +705,7 @@ async function start(){let url=SB_URL||lsGet('relmap_sburl')||'',key=SB_KEY||lsG
  const id=roomFromHash()||newId();try{history.replaceState(null,'','#room='+id)}catch(e){}
  await enter(url,key,id)}
 function stop(){closing=true;clearTimeout(rcT);try{if(chan){chan.untrack();sb.removeChannel(chan)}}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}location.reload()}
-async function copyLink(){const u=location.href;try{await navigator.clipboard.writeText(u);msg('링크 복사됨')}catch(e){prompt('링크를 복사해 주세요',u)}}
-$('#bk').onclick=()=>room?copyLink():S.lock?msg('감상용 파일은 공동 편집으로 변경할 수 없습니다.'):start();$('#bx').onclick=stop;
+$('#bk').onclick=()=>room?dlShow(dl.style.display=='block'&&dlKind=='share'?'':'share'):S.lock?msg('감상용 파일은 공동 편집으로 변경할 수 없습니다.'):start();$('#bx').onclick=stop;
 
 /* 계정·저장: 로그인(이메일 링크·Google)한 사람만 저장(서버·파일)할 수 있고, 게스트(로그인 안 함)는 공유받은 방에 들어가 함께 수정만 할 수 있음.
    서버 저장은 SQL 의 save_room()이 익명 사용자를 거부해서 강제됨. 파일 저장 제한은 화면에서만(보안 아님). 서버 설정이 없으면 예전처럼 누구나 파일 저장. */
@@ -711,7 +728,7 @@ async function oauthLogin(provider){const[c0,c1]=SBCFG(),s=await getSb(c0,c1);ls
  const{error}=await s.auth.signInWithOAuth({provider,options:{redirectTo:location.origin+location.pathname+location.search}});if(error)throw error}
 async function handleAuth(){const c=SBCFG();if(!c)return;const rec=/type=recovery/.test(location.hash),back=/access_token=|error_code=|error_description=/.test(location.hash),bad=/error_code=|error_description=/.test(location.hash);
  try{await getSb(c[0],c[1]);await sb.auth.getSession()}catch(e){console.error(e)}
- if(back){const r0=lsGet('relmap_ret')||'',ret=/^#room=[\w-]{8,64}$/.test(r0)?r0:'';lsSet('relmap_ret','');try{history.replaceState(null,'',location.pathname+location.search+ret)}catch(e){}if(bad)msg('로그인 링크가 만료되었거나 올바르지 않습니다')}
+ if(back){const r0=lsGet('relmap_ret')||'',ret=/^#room=[\w-]{8,64}(&m=[er])?$/.test(r0)?r0:'';lsSet('relmap_ret','');try{history.replaceState(null,'',location.pathname+location.search+ret)}catch(e){}if(bad)msg('로그인 링크가 만료되었거나 올바르지 않습니다')}
  await refreshAcct();if(rec&&member)dlShow('newpw','메일 링크로 접속했습니다. 새 비밀번호를 설정해 주세요.');const rr=roomFromHash();if(back&&rr&&!room)enter(c[0],c[1],rr)}
 async function saveServer(t){if(!room){await start();if(!room)throw new Error('방을 만들지 못했습니다.')}
  const{error}=await sb.rpc('save_room',{p_room:rid,p_title:t});if(error)throw error}
@@ -723,7 +740,7 @@ function authErr(e){const m=String((e&&e.message)||e||'');
  if(/login required/i.test(m))return '로그인이 필요합니다.';
  if(/not authorized|rate limit|over_email_send_rate_limit|smtp/i.test(m))return '메일을 보내지 못했습니다. Supabase 기본 메일은 팀원 주소에만, 시간당 2통까지 발송됩니다. 원문: '+m;
  return m}
-function dlShow(k,note){dlKind=k||'';dlNote=note||'';if(!k){dl.style.display='none';return}wkShow(false);dl.style.display='block';renderDl()}
+function dlShow(k,note){dlKind=k||'';dlNote=note||'';if(!k){dl.style.display='none';return}wkShow(false);dl.style.display='block';renderDl();place(dl,dlBtn())}
 function renderDl(){const k=dlKind,n=dlNote?`<label>${esc(dlNote)}</label>`:'',X='<button data-da="x">닫기</button>';let h='';
  const keep=dl.querySelector('[data-de]'),ev=keep?keep.value:'';   // 안내 문구로 다시 그려도 입력한 이메일은 유지
  const nm=dlNote?`<div class="msg" role="status">${esc(dlNote)}</div>`:'';
@@ -732,6 +749,8 @@ function renderDl(){const k=dlKind,n=dlNote?`<label>${esc(dlNote)}</label>`:'',X
  else if(k=='signup')h=`<div class="au"><div class="brand">RelMap</div><h1>가입하기</h1>${nm}<label class="fld" for="au-e">이메일</label><input id="au-e" type="email" data-de placeholder="name@example.com" autocomplete="email" value="${esc(ev)}"><label class="fld" for="au-p">비밀번호</label><input id="au-p" type="password" data-dp placeholder="비밀번호" autocomplete="new-password"><label class="fld" for="au-p2">비밀번호 재입력</label><input id="au-p2" type="password" data-dp2 placeholder="비밀번호 재입력" autocomplete="new-password"><button class="pb" data-da="up">가입하기</button><button data-da="li">로그인으로 돌아가기</button></div>`;
  else if(k=='newpw')h=`<div class="au"><div class="brand">RelMap</div><h1>새 비밀번호</h1><p class="sub">새로 사용할 비밀번호를 설정해 주세요.</p>${nm}<label class="fld" for="au-n">새 비밀번호</label><input id="au-n" type="password" data-dp placeholder="새 비밀번호" autocomplete="new-password"><button class="pb" data-da="setpw">변경</button><button data-da="x">나중에 하기</button></div>`;
  else if(k=='account')h=`<h3>내 계정</h3><label>${esc(member&&member.email)} 로 로그인 중</label>${n}<div class="row"><button data-da="list">내 관계도</button><button data-da="out">로그아웃</button>${X}</div>`;
+ else if(k=='auto'){const a=bkList();h=`<h3>자동 백업</h3><label>${a.length?'되돌릴 시점을 고르세요. 지금 화면은 복원 전에 새 백업으로 보관됩니다.':'아직 자동 백업이 없습니다.'}</label>${n}`+a.map((b,i)=>`<div class="row"><button data-da="rs" data-i="${i}">${esc(new Date(b.t).toLocaleString('ko-KR',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}))} · 인물 ${+b.n||0} · 선 ${+b.l||0}</button></div>`).join('')+`<div class="row">${X}</div>`}
+ else if(k=='share')h=`<h3>링크 공유</h3><div class="row"><button data-da="le">편집용 링크 복사</button></div><div class="row"><button data-da="lv">감상용 링크 복사</button></div><label>감상용 링크는 읽기 모드로 열립니다. 읽기 모드는 실수를 막는 잠금이라, 주소를 아는 사람은 편집 모드로 바꿀 수 있습니다.</label>${n}<div class="row">${X}</div>`;
  else if(k=='save')h=`<h3>저장</h3><label>서버에 저장하면 「내 관계도」에 보관되며, 같은 계정으로 어디서든 열 수 있습니다.</label><input type="text" data-dt placeholder="관계도 이름" maxlength="100" value="${esc(curTitle)}">${n}<div class="row"><button data-da="srv">서버에 저장</button></div><label>파일로 저장</label><div class="row"><button data-da="fb">백업 파일</button></div><div class="row"><button data-da="fs">감상용 파일</button></div><div class="row">${X}</div>`;
  else if(k=='list')h=`<h3>내 관계도</h3>`+(myList.map(o=>`<div class="wr"><span style="flex:1;color:var(--ink)">${esc(o.title||'이름 없음')} · ${esc(String(o.saved_at||'').slice(0,10))}</span><button data-dopen="${esc(o.id)}">열기</button></div>`).join('')||'<label>저장한 관계도가 없습니다.</label>')+`${n}<div class="row"><button data-da="account">뒤로</button>${X}</div>`;
  dl.innerHTML=h}
@@ -755,10 +774,13 @@ dl.addEventListener('click',async e=>{const d=e.target.dataset;
   if(a=='google')return oauthLogin(a);
   if(a=='out'){await sb.auth.signOut();lsSet('relmap_authed','');location.reload();return}
   if(a=='list'){const{data,error}=await sb.rpc('my_rooms');if(error)throw error;myList=data||[];return dlShow('list')}
+  if(a=='rs'){const b=bkList()[+e.target.dataset.i];if(!b)return;let d;try{d=cleanDoc(JSON.parse(b.d))}catch(x){return dlShow('auto','이 백업을 읽을 수 없습니다.')}if(useDoc(d,false,$('#bb'),'이 백업'))dlShow('');return}
+  if(a=='le'||a=='lv'){const u=location.origin+location.pathname+'#room='+rid+'&m='+(a=='le'?'e':'r');try{await navigator.clipboard.writeText(u);dlShow('share',(a=='le'?'편집용':'감상용')+' 링크를 복사했습니다.')}catch(e){prompt('링크를 복사해 주세요',u)}return}
   if(a=='fb'||a=='fs'){dlFile(a=='fs'?'share':'backup');return}
   if(a=='srv'){const t=(dl.querySelector('[data-dt]').value||'').trim()||'내 관계도';curTitle=t;dlShow('save','저장하는 중…');await saveServer(t);dlShow('save','저장했습니다. 주소창의 링크를 북마크하거나 계정 → 내 관계도에서 다시 열 수 있습니다.')}}
  catch(err){dlShow(dlKind||'login',authErr(err))}});
-$('#bs').onclick=()=>{if(!SBCFG())return dlFile('backup');if(!member)return dlShow('login','로그인이 필요합니다.');dlShow('save')};
+$('#bs').onclick=()=>{if(!SBCFG())return dlFile('backup');if(dl.style.display=='block'&&dlKind=='save')return dlShow('');if(!member)return dlShow('login','로그인이 필요합니다.');dlShow('save')};
+$('#bb').onclick=()=>dlShow(dl.style.display=='block'&&dlKind=='auto'?'':'auto');
 $('#ba').onclick=()=>dlShow(dl.style.display=='block'?'':member?'account':'login');
 $('#pp').onclick=e=>{if(!e.target.closest('.me'))return;const n=(prompt('표시 이름',me.name)||'').trim().slice(0,20);if(!n)return;me.name=n;lsSet('relmap_name',n);trackMe();renderOthers()};
 cv.addEventListener('pointermove',e=>{if(!room||!ready||!S.view)return;const r=cv.getBoundingClientRect(),v=S.view;
@@ -771,7 +793,7 @@ wk.addEventListener('focusin',e=>{if(e.target.matches('input'))CB.gs('p')});wk.a
 
 /* 시작 */
 migrate();S.nodes.forEach(mk);drawLinks();
-wsLoad();setMode(new URLSearchParams(location.search).get('mode')=='edit'||!S.nodes.some(n=>n.t!='w')?'e':'r');lockUi();
+wsLoad();bkSnap();const hm=(location.hash.match(/[#&]m=([er])/)||[])[1];setMode(new URLSearchParams(location.search).get('mode')=='edit'||hm=='e'||(!hm&&!S.nodes.some(n=>n.t!='w'))?'e':'r');lockUi();
 if(S.view)applyView();else fit();phb();heat(.4);tick();snap();document.fonts&&document.fonts.ready.then(ovq);
 {const r0=roomFromHash(),u0=SB_URL||lsGet('relmap_sburl'),k0=SB_KEY||lsGet('relmap_sbkey');if(r0&&u0&&k0)enter(u0,k0,r0)}
 if(SBCFG()){$('#ba').hidden=false;if(lsGet('relmap_authed')||/access_token=|error_code=|error_description=/.test(location.hash))handleAuth()}

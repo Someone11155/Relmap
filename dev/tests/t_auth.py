@@ -28,7 +28,11 @@ with sync_playwright() as p:
     login(A,'owner@example.com');A.reload();settle(A,1800)   # 메일 링크를 눌러 돌아오는 것과 같이 새로고침
     A.click('#ba');settle(A,200)
     ok('A4 로그인하면 계정 버튼에 이름이 보이고 계정 창에 이메일이 보임(새로고침 뒤에도 유지)',A.inner_text('#ba')=='owner' and 'owner@example.com' in A.inner_text('#dl'))
+    A.click('[data-da=x]');A.click('#ba');settle(A,200);bb=A.evaluate("(()=>{const r=document.querySelector('#ba').getBoundingClientRect(),d=document.querySelector('#dl').getBoundingClientRect();return [d.top-r.bottom,d.left-r.left,d.right]})()")
+    ok('A4b 계정 창은 계정 버튼 바로 아래에 드롭다운으로 뜸',abs(bb[0]-8)<2 and bb[1]<3 and bb[2]<=1280)
     A.click('[data-da=x]');A.click('#bs');settle(A,200)
+    A.click('#bs');settle(A,200);closed=not dlv(A);A.click('#bs');settle(A,200)
+    ok('A4c 저장 창이 떠 있을 때 저장 버튼을 한 번 더 누르면 닫히고, 또 누르면 다시 열림',closed and dlv(A))
     ok('A5 로그인한 사람의 저장 창: 서버에 저장 / 백업 파일 / 감상용 파일',A.locator('#dl [data-da=srv]').count()==1 and A.locator('#dl [data-da=fb]').count()==1 and A.locator('#dl [data-da=fs]').count()==1)
     with A.expect_download() as d1: A.click('[data-da=fb]')
     with A.expect_download() as d2: A.click('[data-da=fs]')
