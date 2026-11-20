@@ -14,7 +14,7 @@
 - `worker/photos.mjs` — 사진 서버(Cloudflare Worker + R2). 사용자가 대시보드에 붙여 넣어 배포(설정은 `worker/README.md`). 테스트는 `dev/fakesb.mjs` 가 이 파일을 그대로 8791 포트에 올려 R2 만 메모리로 흉내. 명령줄 배포용 설정은 `worker/wrangler.photos.toml`(`npx wrangler deploy -c wrangler.photos.toml`, 공개 값만). Pages 끌어다 놓기는 `functions` 폴더를 지원하지 않아서 Pages 안이 아니라 별도 Worker.
 - `worker/relay.mjs`·`worker/rt.mjs`·`worker/wrangler.toml` — 실시간 중계 서버(Cloudflare Worker + Durable Object). `relay.mjs` 가 중계 규칙(순수 로직, 테스트가 그대로 씀), `rt.mjs` 는 Durable Object 껍데기(`cloudflare:workers` 를 가져와서 Node 테스트로는 못 돌림), 배포는 사용자가 Wrangler 로(Durable Object 는 대시보드 붙여넣기 배포가 공식 문서에 없음 — `worker/README.md`). 테스트는 `dev/fakesb.mjs` 가 `relay.mjs` 를 `ws` 패키지로 8792 포트에 올림.
 - `supabase_schema.sql` — Supabase SQL Editor 에서 실행하는 스키마(표, RLS, 함수 `join_room`/`seed_room`/`apply_ops`, Realtime 등록).
-- `README.md` — 사용자용 설정·배포 순서. @README.md
+- `README.md` — GitHub 첫 화면용 소개(기능·구조·시작하기). `SETUP.md` — 사용자용 설정·배포 순서. @SETUP.md
 - `dev/` — 테스트 환경. @dev/README.md
 
 ## index.html 지도 (주석으로 grep)
