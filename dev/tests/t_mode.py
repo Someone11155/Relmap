@@ -3,6 +3,7 @@ from helpers import *
 BASE='http://localhost:8765/index.html'      # 모드 지정 없음 = 읽기 모드로 시작
 EDIT=BASE+'?mode=edit'
 vis=lambda pg:pg.eval_on_selector('#ins','e=>getComputedStyle(e).display')!='none'
+pfv=lambda pg:pg.evaluate("!document.querySelector('#pf').hidden")
 mode=lambda pg:pg.evaluate("cv.dataset.mode")
 pos=lambda pg,i:pg.evaluate("i=>{const n=nd(i);return [Math.round(n.x),Math.round(n.y)]}",i)
 view=lambda pg:pg.evaluate("[Math.round(S.view.x),Math.round(S.view.y),+S.view.k.toFixed(3)]")
@@ -50,11 +51,12 @@ with sync_playwright() as p:
     ok('M3b 읽기: 빈 곳을 끌면 화면이 이동',view(R_)!=v0)
     ok('M4 읽기: 끈 뒤에 프로필이 안 뜸',not vis(R_))
     R_.click(P);settle(R_,200)
-    ok('M5 읽기: 인물을 누르면 읽기 전용 프로필(입력칸 없음, 이름 표시)',vis(R_) and R_.locator('#ins input,#ins textarea').count()==0 and '김서준' in R_.inner_text('#ins'))
-    mdrag(R_,P,40,40);settle(R_,100)
-    ok('M6 읽기: 프로필이 열린 채 인물을 끌면 프로필이 닫힘',not vis(R_))
+    ok('M5 읽기: 인물을 누르면 읽기 전용 프로필 모달(입력칸 없음, 이름 표시)',pfv(R_) and R_.locator('#pf input,#pf textarea').count()==0 and '김서준' in R_.inner_text('#pf'))
+    R_.keyboard.press('Escape');settle(R_,200);mdrag(R_,P,40,40);settle(R_,100)
+    ok('M6 읽기: 모달을 닫으면 다시 인물을 끌 수 있고, 끌어도 모달이 안 뜸',not pfv(R_) and R_.evaluate('!cv.inert'))
     n0=R_.evaluate('S.nodes.length');R_.click(P);R_.keyboard.press('Delete');R_.keyboard.press('KeyM');settle(R_,200)
     ok('M7 읽기: Delete 로 안 지워지고 M 키도 무시됨',R_.evaluate('S.nodes.length')==n0 and mode(R_)=='r')
+    R_.keyboard.press('Escape');settle(R_,200)
     R_.click('#bm');settle(R_,200);R_.evaluate('alpha=0')
     ok('M8 편집 버튼 → 편집 모드(도구와 이동 버튼이 보임)',mode(R_)=='e' and R_.is_visible('[data-t=p]') and R_.is_visible('#bv'))
     n1=R_.evaluate('S.nodes.length');R_.click('[data-t=p]');settle(R_,200);added=R_.evaluate('S.nodes.length')==n1+1;R_.keyboard.press('Delete');settle(R_,100)   # 새 인물이 b 위에 겹쳐 남지 않게 바로 지움

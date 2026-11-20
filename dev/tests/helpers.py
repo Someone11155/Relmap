@@ -27,7 +27,8 @@ def settle(pg,ms=1500): pg.wait_for_timeout(ms)
 def client(b,pre=''):
     ctx=b.new_context(viewport={'width':1280,'height':760})
     ctx.route('**/@supabase/supabase-js@2.118.0/+esm',lambda r:r.fulfill(status=200,content_type='application/javascript',body=STUB))
-    ctx.add_init_script("try{localStorage.setItem('relmap_sburl','http://localhost:8790');localStorage.setItem('relmap_sbkey','sb_publishable_test')}catch(e){}"+pre)
+    rt="try{localStorage.setItem('relmap_rt','ws://localhost:8792')}catch(e){}" if os.environ.get('RT') else ''   # RT=1 이면 모든 테스트를 실시간 중계 서버 방식으로 돌려 봄(일부 테스트는 Supabase 채널 전용이라 맞지 않음)
+    ctx.add_init_script("try{localStorage.setItem('relmap_sburl','http://localhost:8790');localStorage.setItem('relmap_sbkey','sb_publishable_test')}catch(e){}"+rt+pre)
     pg=ctx.new_page(); pg.on('pageerror',lambda e:ERR.append(str(e))); pg.on('dialog',lambda d:(ERR.append('DIALOG:'+d.message),d.accept())); return pg
 
 ERR=[]   # 테스트 중 발생한 페이지 오류·예상 못한 대화상자가 쌓이는 목록 (모든 테스트가 공유)

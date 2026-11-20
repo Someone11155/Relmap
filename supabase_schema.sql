@@ -76,7 +76,8 @@ end $$;
 --   {"k":"n","id":"...","put":{...전체...}}            새로 만들기 / 통째로 덮어쓰기(삭제된 것 되살리기 포함)
 --   {"k":"n","id":"...","set":{...},"rm":["필드"]}     일부 필드만 바꾸기 (다른 사람이 바꾼 다른 필드는 유지)
 --   {"k":"n","id":"...","del":true}                     삭제
--- 반환: 바뀐 항목들의 최종 상태 [{k,id,ver,data,deleted}]
+-- 반환: 바뀐 항목들의 최종 상태 [{k,id,ver,data,deleted,h}]
+--   사진(img·im)은 크기가 커서(egress 절약) 응답에서 빼고 h=true 로 표시 — 앱이 자기가 가진 사진으로 채움
 create or replace function public.apply_ops(p_room text, p_ops jsonb)
 returns jsonb language plpgsql security definer set search_path = public as $$
 declare op jsonb; v_k text; v_id text; res jsonb;
@@ -112,7 +113,7 @@ begin
        where room = p_room and kind = v_k and id = v_id and not deleted;
     end if;
   end loop;
-  select coalesce(jsonb_agg(jsonb_build_object('k', i.kind, 'id', i.id, 'ver', i.ver, 'data', i.data, 'deleted', i.deleted)), '[]'::jsonb)
+  select coalesce(jsonb_agg(jsonb_build_object('k', i.kind, 'id', i.id, 'ver', i.ver, 'data', i.data - 'img' - 'im', 'h', i.data ?| array['img','im'], 'deleted', i.deleted)), '[]'::jsonb)
     into res
     from public.items i
    where i.room = p_room

@@ -37,7 +37,8 @@ with sync_playwright() as p:
     ok('P6 놓으면 인물·그룹 원이 원래 자리·크기로 돌아옴',maxoff(pg)<.5 and pg.evaluate("(()=>{const c=nd('a'),e=els.a.style;return e.left==c.x+'px'&&e.top==c.y+'px'&&e.width==c.w+'px'&&e.height==c.h+'px'})()") and pg.evaluate("document.querySelector('.n.p[data-id=b]').style.translate")=='' and poss(pg)==p0)
     # 짧게 누르면 프로필, 움직임 없음
     pg.click(P);settle(pg,300)
-    ok('P7 짧게 누르면 프로필이 뜨고 인물은 안 움직임',vis(pg) and maxoff(pg)==0)
+    ok('P7 짧게 누르면 프로필 모달이 뜨고 인물은 안 움직임',pg.evaluate("!document.querySelector('#pf').hidden") and maxoff(pg)==0)
+    pg.keyboard.press('Escape');settle(pg,200)
     # 편집 모드로 바꾸면 임시 움직임이 사라짐
     x,y=ctr(pg,P);pg.mouse.move(x,y);pg.mouse.down();pg.mouse.move(x+100,y,steps=6);settle(pg,200);pg.mouse.up();pg.click('#bm');settle(pg,100)
     ok('P8 편집 모드로 바꾸면 임시 움직임이 즉시 사라짐',maxoff(pg)==0 and pg.evaluate("[...document.querySelectorAll('.n.p')].every(e=>e.style.translate==='')"))

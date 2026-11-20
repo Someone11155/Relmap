@@ -39,6 +39,16 @@ window.RELMAP = { SB_URL:'https://xxxx.supabase.co', SB_KEY:'sb_publishable_…'
 - **수정 후 다시 올리기**: 프로젝트에서 **Create a new deployment** → Production → **폴더 전체**(두 파일 모두)를 다시 올린다. 값이 채워진 `config.js` 는 따로 보관.
 - 내 도메인: 프로젝트 **Custom domains → Set up a domain**. 먼저 Pages 에 등록한 뒤 DNS 에 `CNAME relmap → <프로젝트>.pages.dev` 를 추가(서브도메인 권장). Turnstile Hostname 에도 추가.
 
+## 4-1. (선택, 권장) 사진 서버 — 사진을 Cloudflare R2 에 두기
+- 사진이 서버 DB 행 안에 들어 있으면 방에 들어올 때마다 사진까지 내려받아 Supabase 의 데이터 전송량(egress) 무료 한도(월 5GB)를 빨리 씁니다. 사진을 R2(전송 요금 없음)에 두고 문서에는 주소만 넣으면 이 문제가 사라집니다.
+- 설정은 `worker/README.md` 를 따라 하세요(Worker 하나와 R2 버킷 하나). 끝나면 `config.js` 의 `PHOTO` 에 Worker 주소를 적고 폴더를 다시 올립니다.
+- 안 하면 예전처럼 사진이 문서 안에 들어갑니다(앱은 그대로 동작).
+
+## 4-2. (선택, 권장) 실시간 중계 서버 — Supabase 실시간 메시지 한도 피하기
+- Supabase 무료는 실시간 메시지가 월 200만 개라서 커서·접속자·변경을 계속 주고받으면 금방 찹니다. 이 부분만 Cloudflare 의 중계 서버(Durable Object)가 맡게 하면 Supabase 실시간 메시지를 쓰지 않습니다. 문서 저장과 로그인은 그대로 Supabase 입니다.
+- 설정은 `worker/README.md` 의 "실시간 중계 서버" 를 따라 하세요(명령 몇 줄). 끝나면 `config.js` 의 `REALTIME` 에 주소를 적고 폴더를 다시 올립니다.
+- 안 하면 예전처럼 Supabase Realtime 을 씁니다(앱은 그대로 동작).
+
 ## 5. 사용
 - `공동 편집` → 주소 뒤에 `#room=…` 이 붙는다. 그 주소를 믿을 만한 사람에게만 공유(주소 = 열쇠).
 - 툴바 `저장`: 서버 설정이 없으면 바로 JSON 파일로 저장. 설정이 있으면 로그인한 사람만 저장할 수 있고(서버 저장·백업 파일·감상용 파일), 감상용 파일을 `불러오기` 하면 읽기 모드만 쓸 수 있어요. `불러오기` = JSON. 공동 편집 중 불러오기는 방 전체가 바뀌며 `↶` 로 되돌릴 수 있다.

@@ -35,5 +35,14 @@ with sync_playwright() as p:
     ok('M8 방 안에서 여러 명을 지우면 다른 사람 화면·서버에도 반영됨',B.evaluate("S.nodes.map(n=>n.id).join()")=='d' and same(A,B,room=room))
     A.keyboard.press('Control+z');settle(A,1800)
     ok('M9 방 안에서 실행 취소하면 모두 되살아남',B.evaluate("S.nodes.length")==4 and same(A,B,room=room))
+    got=lambda:sorted(set(ms(A))|({A.evaluate('sel')}-{None}))   # 한 명만 걸치면 다중 선택이 아니라 단일 선택이 됨
+    # 사각형 선택은 인물 아이콘 원(반지름 42)에 닿을 때만: 글자 영역·원 밖 네모 모서리는 해당 없음
+    A.evaluate(SETUP);A.evaluate("S.view={x:cv.clientWidth/2,y:cv.clientHeight/2,k:1};applyView();nd('b').name='가나다라마바사아자차';upd(nd('b'));select(null)");settle(A,200)
+    box(A,(115,-98),(185,-70));t1=got();A.evaluate("select(null)")
+    ok('M9 사각형이 인물 이름·설명 글자 위만 지나면 선택되지 않음',t1==[])
+    box(A,(-30,-130),(8,-92));t2=got();A.evaluate("select(null)")
+    ok('M10 사각형이 아이콘의 네모 모서리(원 밖)만 스치면 선택되지 않음',t2==[])
+    box(A,(-30,-130),(20,-70));t3=got();A.evaluate("select(null)")
+    ok('M11 사각형이 아이콘 원에 닿으면 선택됨',t3==['b'])
     ok('Z 페이지 오류·예상 못한 대화상자 없음',not ERR)
     b.close()

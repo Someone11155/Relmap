@@ -1,0 +1,19 @@
+# 실시간 중계 서버(rt.mjs) 배포 설정. 설정 방법은 worker/README.md
+# 사진 서버(photos.mjs)는 이 파일과 별개로 대시보드에 붙여 넣어 쓰는 다른 Worker 입니다.
+name = "relmap-rt"
+main = "rt.mjs"
+compatibility_date = "2026-04-07"
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "Room"
+
+# 무료 플랜은 SQLite 방식 클래스만 쓸 수 있음(이 서버는 저장소를 쓰지 않지만 선언은 필요)
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]
+
+[vars]
+# 아래 두 값은 공개돼도 되는 값입니다(Supabase 프로젝트 URL, publishable 키). secret / service_role 키는 절대 넣지 마세요.
+SB_URL = ""   # 예: "https://abcd1234.supabase.co"
+SB_KEY = ""   # 예: "sb_publishable_…"

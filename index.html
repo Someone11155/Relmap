@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>인물 관계도</title>
+<script>/* 화면 모드: 고른 값(relmap_theme: light|dark, 없으면 시스템 설정)을 첫 화면을 그리기 전에 html[data-theme] 로 적용 */
+var t;try{t=localStorage.getItem('relmap_theme')}catch(e){}document.documentElement.dataset.theme=t=='light'||t=='dark'?t:matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{color-scheme:light;
@@ -17,7 +19,7 @@
 --sh-md:0 4px 6px -2px rgba(23,23,23,.07),0 10px 15px -3px rgba(23,23,23,.07);
 --ease:cubic-bezier(.2,0,0,1);
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0F0F10;--dot:rgba(112,115,124,.32);--panel:#212225;--ink:#F7F7F8;--ink2:rgba(194,196,200,.88);--mut:rgba(174,176,182,.61);--assist:rgba(152,155,162,.28);--line:rgba(112,115,124,.32);--acc:#3385FF;--acc-ln:rgba(51,133,255,.4);--neg:#FF6363;--neg-t:#FF6363;--ln:#989BA2}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0F0F10;--dot:rgba(112,115,124,.32);--panel:#212225;--ink:#F7F7F8;--ink2:rgba(194,196,200,.88);--mut:rgba(174,176,182,.61);--assist:rgba(152,155,162,.28);--line:rgba(112,115,124,.32);--acc:#3385FF;--acc-ln:rgba(51,133,255,.4);--neg:#FF6363;--neg-t:#FF6363;--ln:#989BA2}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font:400 14px/20px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;letter-spacing:.0145em;-webkit-font-smoothing:antialiased}
 #cv{position:relative;height:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;
@@ -30,19 +32,20 @@ background-image:radial-gradient(var(--dot) 1.3px,transparent 1.6px);background-
 .c{z-index:1;border:2px solid;border-radius:50%}
 .c.gi::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--gi) center/cover;opacity:.4;pointer-events:none}
 .ct{position:absolute;left:0;right:0;text-align:center;font-weight:700;line-height:1.2;pointer-events:none;padding:0 12%;white-space:pre-wrap}
-.rz{display:none;position:absolute;width:16px;height:16px;border-radius:50%;background:var(--acc);border:2px solid var(--panel);box-shadow:var(--sh-xs);right:calc(14.64% - 8px);bottom:calc(14.64% - 8px);cursor:nwse-resize}
+.rz{display:none;position:absolute;width:min(var(--rs,16px),25%);aspect-ratio:1;border-radius:50%;background:var(--acc);border:var(--rb,2px) solid var(--panel);box-shadow:var(--sh-xs);right:14.64%;bottom:14.64%;translate:50% 50%;cursor:nwse-resize}/* --rs 는 applyView 가 정함: 화면에서 보이는 크기가 확대·축소를 절반쯤 따라감(작은 원에선 원 너비의 1/4 까지만). --rb 는 테두리를 화면에서 늘 2px 로 */
 .c.sel .rz{display:block}
 .c.sel,.c.ms{border-style:dashed}
 .p.sel .im,.p.ms .im,.cm .p.sel2 .im,.c.hot{outline:2px solid var(--acc);outline-offset:3px}.t.sel,.t.ms{outline:2px dashed var(--acc)}
 #sbox{position:fixed;display:none;z-index:50;pointer-events:none;border:1px solid #0077ffff;background:#0077ff1a;border-radius:4px}
-.p{display:flex;align-items:flex-start;gap:14px;width:max-content}
+.p{display:flex;align-items:flex-start;gap:14px;width:max-content;pointer-events:none}
+.p .im{pointer-events:auto}/* 하이라이트·선택·끌기는 아이콘 원 위에서만(이름·설명 글자 영역은 마우스를 통과시킴) */
 .ptx{padding-top:2px;max-width:280px}
 .im{flex:none;width:84px;height:84px;border-radius:50%;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;font-weight:700;letter-spacing:0;box-shadow:var(--sh-sm),inset 0 0 0 1px rgba(23,23,25,.08)}
 .nm{font-size:18px;font-weight:600;line-height:26px;letter-spacing:-.002em;overflow-wrap:anywhere}
 .ds{margin-top:2px;color:var(--ink2);font-size:14px;line-height:20px;letter-spacing:.0145em;white-space:pre-wrap;overflow-wrap:anywhere}
 .ds:empty{display:none}
 .t{white-space:pre;width:max-content;padding:4px 8px;line-height:1.3;border-radius:8px;min-width:24px}
-.lb{position:absolute;z-index:1000000;transform:translate(-50%,-50%);background:color-mix(in srgb,var(--panel) 90%,transparent);border-radius:8px;padding:3px 10px;font-size:13px;line-height:18px;font-weight:500;letter-spacing:.0145em;color:var(--ink2);white-space:nowrap;cursor:pointer;box-shadow:var(--sh-xs),inset 0 0 0 1px var(--line);transition:opacity .15s}
+.lb{position:absolute;z-index:1000000;transform:translate(-50%,-50%);background:color-mix(in srgb,var(--panel) 90%,transparent);border-radius:calc(8px*var(--lf,1));padding:calc(3px*var(--lf,1)) calc(10px*var(--lf,1));font-size:calc(13px*var(--lf,1));line-height:calc(18px*var(--lf,1));font-weight:500;letter-spacing:.0145em;color:var(--ink2);white-space:nowrap;cursor:pointer;box-shadow:var(--sh-xs),inset 0 0 0 1px var(--line);transition:opacity .15s}
 .lb.ov:not(.sel){opacity:.35}
 .lb.sel{background:var(--acc-bg);color:var(--acc);box-shadow:var(--sh-xs),inset 0 0 0 1px var(--acc-ln)}
 .lod .ptx,.lod .lb{display:none}
@@ -78,6 +81,7 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
 #ins textarea{min-height:64px;resize:vertical}
 #ins input[type=range]{display:block;width:100%;margin-top:8px;accent-color:var(--acc)}
 #ins input[type=checkbox]{accent-color:var(--acc)}
+#ins input[type=number]{box-sizing:border-box;min-width:0;padding:7px 10px;font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:0;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line)}
 #ins input[type=color]{display:block;margin-top:6px;width:44px;height:32px;padding:2px;border:0;border-radius:8px;background:none;box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
 .row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .row button{box-shadow:inset 0 0 0 1px var(--line);padding:7px 14px}
@@ -106,10 +110,20 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
 .tsm p{margin:0 0 4px}
 #ins .tg,#wk .tg{display:flex;align-items:center;gap:6px;margin:0 0 4px;font-size:13px;color:var(--ink2)}
 #ins .tg button,#wk .tg button{padding:4px 6px;font-size:13px}
+#ins .dd{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin-top:6px;padding:9px 12px;font-size:14px;text-align:left;color:var(--ink);background:var(--panel);border:0;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
+#ins .dd span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ins .ddl{margin:4px 0 8px;padding:8px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);max-height:min(240px,35vh);overflow:auto}
 #ins .eps,#wk .eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:2px 6px;margin:0 0 8px 22px}
 #ins .eps label,#wk .eps label{display:flex;gap:4px;align-items:center;margin:0;font-size:12px;overflow-wrap:anywhere}
 #wk .wn{display:grid;gap:4px;margin:0 0 10px 8px}
+#wk .ck{margin:0 0 8px 12px}
+#wk select{display:block;box-sizing:border-box;min-width:0;margin-top:6px;padding:7px 10px;font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:0;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line)}
+#wk .wr select{margin:0;width:auto;flex:none}#wk .wr span{white-space:nowrap}#wk label select{width:100%}
+.wi1{font-weight:700}.wi2{font-weight:800;font-size:1.15em}
 #wk,#dl{display:none;position:absolute;z-index:2000000;left:12px;top:calc(72px + env(safe-area-inset-top,0px));width:300px;max-height:calc(100% - 100px);overflow:auto;background:var(--panel);border-radius:16px;padding:16px;box-shadow:var(--sh-md),inset 0 0 0 1px var(--line);user-select:text;-webkit-user-select:text}
+#dl .fl{display:grid;gap:2px;margin:0 0 12px}#dl .fl button{width:100%;white-space:normal;overflow-wrap:anywhere;text-align:left;padding:7px 10px;font-size:14px;color:var(--ink)}
+.p.found .im{animation:fd .8s ease-out 2}@keyframes fd{0%{box-shadow:0 0 0 0 var(--acc)}100%{box-shadow:0 0 0 22px transparent}}
+@media (prefers-reduced-motion:reduce){.p.found .im{animation:none;outline:3px solid var(--acc);outline-offset:3px}}
 #wk h3,#dl h3{margin:0 0 12px;font-size:16px;line-height:24px;font-weight:600;letter-spacing:.0057em}
 #wk label,#dl label{display:block;margin-bottom:12px;color:var(--ink2);font-size:12px;line-height:16px}
 .wr{display:flex;gap:6px;align-items:center;margin-bottom:8px;font-size:12px;color:var(--mut)}
@@ -138,6 +152,40 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
 #dl.full .or{display:flex;align-items:center;gap:12px;margin:4px 0 16px;color:var(--mut);font-size:12px}
 #dl.full .or:before,#dl.full .or:after{content:"";flex:1;height:1px;background:var(--line)}
 #dl.full .au>button+button{margin-top:8px}
+.ver{display:grid;gap:4px;margin:0 0 8px}
+.vp{width:56px;height:56px;border-radius:50%;object-fit:cover;box-shadow:inset 0 0 0 1px var(--line)}
+.hx{display:block;width:100%;max-width:280px;margin:0 auto;overflow:visible}
+.hg{fill:none;stroke:var(--line);stroke-width:1}
+.ht{fill:var(--ink2);font-size:12px}
+#pf{position:fixed;inset:0;z-index:2500000;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+#pf[hidden]{display:none}
+.pf-scrim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.pf-card{position:relative;width:min(840px,100%);height:min(600px,100%);background:var(--panel);color:var(--ink);border-radius:16px;box-shadow:var(--sh-md),inset 0 0 0 1px var(--line);overflow:hidden;user-select:text;-webkit-user-select:text}
+.pf-x{position:absolute;top:10px;right:10px;z-index:1}
+.pf-cols{display:grid;grid-template-columns:320px minmax(0,1fr);height:100%}
+.pf-l,.pf-r{min-height:0;overflow:auto;overscroll-behavior:contain}
+.pf-l{padding:32px 24px 24px}
+.pf-r{background:var(--bg);padding:8px 0}
+.pf-av,.pm{flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;color:#fff;font-weight:700;letter-spacing:0}
+.pf-av{width:96px;height:96px;font-size:38px;box-shadow:var(--sh-sm),inset 0 0 0 1px rgba(23,23,25,.08)}
+.pm{width:32px;height:32px;font-size:14px}
+.pf-av img,.pm img{width:100%;height:100%;object-fit:cover;display:block}
+.pf-n{margin:16px 0 4px;font-size:22px;line-height:30px;font-weight:700;letter-spacing:-.012em;overflow-wrap:anywhere}
+.pf-d{margin:8px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink2)}
+.pf-v{display:block;margin:8px 0 0;color:var(--ink2);font-size:12px;line-height:16px}
+#pf select{display:block;box-sizing:border-box;width:100%;margin-top:6px;padding:8px 10px;font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:0;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
+#pf select:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--acc)}
+#pf label{display:block;margin:12px 0 0;color:var(--mut);font-size:13px;line-height:18px}
+#pf .hx{margin-top:20px}
+.pf-s{padding:16px 20px 6px;font-size:13px;font-weight:600;color:var(--mut)}
+.pf-e{padding:4px 20px 12px;font-size:14px;color:var(--mut)}
+#pf .go,.gr{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;min-height:48px;padding:8px 20px;border-radius:0;text-align:left;font-size:14px}
+#pf .go:hover{background:var(--fill)}
+.pd{width:10px;height:10px;flex:none;border-radius:50%}
+.gt{display:flex;flex-direction:column;min-width:0}
+.gt b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gt i{font-style:normal;font-size:13px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:700px){.pf-cols{display:block;overflow:auto}.pf-l,.pf-r{overflow:visible}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -160,6 +208,10 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
 <symbol id="i-swap" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></symbol>
 <symbol id="i-film" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></symbol>
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-move" viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/></symbol>
@@ -170,17 +222,18 @@ button:disabled{color:var(--assist);background:transparent;cursor:not-allowed}
   <div id="tb">
     <button id="bm" title="읽기 모드 ↔ 편집 모드"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg><span class="bt">편집</span></button><button id="bv" class="em" title="이동 모드 (M)"><svg class="ic" aria-hidden="true"><use href="#i-move"/></svg><span class="bt">이동</span></button><span class="sp"></span><button data-t="p" class="ed"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span class="bt">인물</span></button><button data-t="t" class="ed"><svg class="ic" aria-hidden="true"><use href="#i-type"/></svg><span class="bt">텍스트</span></button><button data-t="c" class="ed"><svg class="ic" aria-hidden="true"><use href="#i-circle"/></svg><span class="bt">원</span></button><button id="bc" class="ed"><svg class="ic" aria-hidden="true"><use href="#i-link"/></svg><span class="bt">선 연결</span></button><button id="bw" class="ed" title="작품 목록 관리"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg><span class="bt">작품</span></button><button id="bp" class="ed"><svg class="ic" aria-hidden="true"><use href="#i-magnet"/></svg><span class="bt"></span></button><button id="bh" class="ib ed" title="다시 정렬" aria-label="다시 정렬"><svg class="ic" aria-hidden="true"><use href="#i-rotate"/></svg></button><button id="bun" class="ib ed" title="실행 취소 (Ctrl+Z)" aria-label="실행 취소"><svg class="ic" aria-hidden="true"><use href="#i-undo"/></svg></button><button id="bre" class="ib ed" title="다시 실행 (Ctrl+Shift+Z)" aria-label="다시 실행"><svg class="ic" aria-hidden="true"><use href="#i-redo"/></svg></button>
     <span class="sp ed"></span>
-    <button id="zo" class="ib" aria-label="축소"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button><span id="zl">100%</span><button id="zi" class="ib" aria-label="확대"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button><button id="bf"><svg class="ic" aria-hidden="true"><use href="#i-fit"/></svg><span class="bt">전체 보기</span></button><button id="bq" class="rd" title="내가 본 작품 고르기"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg><span class="bt">본 작품</span></button>
+    <button id="zo" class="ib" aria-label="축소"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button><span id="zl">100%</span><button id="zi" class="ib" aria-label="확대"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button><button id="bf"><svg class="ic" aria-hidden="true"><use href="#i-fit"/></svg><span class="bt">전체 보기</span></button><button id="bsr" title="인물·그룹·작품 검색"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span class="bt">검색</span></button><button id="bq" class="rd" title="내가 본 작품 고르기"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg><span class="bt">본 작품</span></button>
     <span class="sp"></span>
     <button id="bk"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span class="bt">공동 편집</span></button><span id="pp"></span><button id="bx" class="ib" hidden title="공동 편집 끝내기" aria-label="공동 편집 끝내기"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     <span class="sp"></span>
-    <button id="bs" title="관계도를 JSON 파일로 저장"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg><span class="bt">저장</span></button><button id="bl" title="JSON 파일에서 관계도 불러오기"><svg class="ic" aria-hidden="true"><use href="#i-folder"/></svg><span class="bt">불러오기</span></button><button id="bb" class="ed" title="자동 백업에서 되돌리기"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><span class="bt">백업</span></button><button id="br" class="ed">초기화</button><span class="sp"></span><button id="ba" hidden title="로그인 / 내 계정"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span class="bt">로그인</span></button>
+    <button id="bs" title="관계도를 JSON 파일로 저장"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg><span class="bt">저장</span></button><button id="bl" title="JSON 파일에서 관계도 불러오기"><svg class="ic" aria-hidden="true"><use href="#i-folder"/></svg><span class="bt">불러오기</span></button><button id="bb" class="ed" title="자동 백업에서 되돌리기"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><span class="bt">백업</span></button><button id="br" class="ed">초기화</button><span class="sp"></span><button id="bth" class="ib" aria-label="화면 모드"><svg class="ic" aria-hidden="true"><use href="#i-monitor"/></svg></button><button id="ba" hidden title="로그인 / 내 계정"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span class="bt">로그인</span></button>
   </div>
   <div id="sbox"></div>
   <div id="ins"></div>
   <div id="wk"></div>
   <div id="dl"></div>
 </div>
+<div id="pf" hidden><div class="pf-scrim"></div><div class="pf-card" role="dialog" aria-modal="true" aria-label="인물 프로필"><button class="ib pf-x" data-pf="x" aria-label="닫기"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button><div class="pf-cols"></div></div></div>
 <script src="config.js"></script>
 <script>
 const $=s=>document.querySelector(s),cv=$('#cv'),W=$('#w'),svg=$('#ln'),ins=$('#ins');
@@ -201,6 +254,26 @@ links:[{id:'l1',a:'b',b:'c',label:'소꿉친구',col:'#70737C',w:5,dir:'both'},{
 let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 S=S&&S.nodes?S:sample();
 let mode='',sel=null,msel=new Set(),connMode=false,conn=null,drag=null,els={},lels={},zc=100,st=0,hov=null,alpha=0;
+/* 다크 모드에서는 사용자가 고른 색(인물·그룹·선·글자·스탯)을 oklch 밝기 L 만 1-L 로 뒤집어 보여 줌.
+   색상 h·채도 c 는 그대로, sRGB 밖으로 나가면 채도를 줄임. 저장값(파일·서버)은 그대로 두고 화면에만 적용(dc). 투명도 자리(#rgba·#rrggbbaa)는 유지 */
+const DKQ=matchMedia('(prefers-color-scheme:dark)'),dcM=new Map();
+/* 화면 모드 thm: 'light' | 'dark' | 'system'(기본, 컴퓨터·폰 설정을 따름). 고른 값은 이 브라우저에만 relmap_theme 로 저장 */
+let thm='system';try{const t=localStorage.getItem('relmap_theme');if(t=='light'||t=='dark')thm=t}catch(e){}
+const isDark=()=>thm=='dark'||thm=='system'&&DKQ.matches;
+function dc(c){if(!isDark()||typeof c!='string'||!/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(c))return c;let r=dcM.get(c);if(r)return r;
+ let h=c.slice(1);if(h.length<5)h=[...h].map(x=>x+x).join('');
+ const lin=v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4,enc=v=>(v=Math.min(1,Math.max(0,v)))<=.0031308?12.92*v:1.055*v**(1/2.4)-.055,
+  [R,G,B]=[0,2,4].map(i=>lin(parseInt(h.substr(i,2),16)/255)),
+  l=Math.cbrt(.4122214708*R+.5363325363*G+.0514459929*B),m=Math.cbrt(.2119034982*R+.6806995451*G+.1073969566*B),s=Math.cbrt(.0883024619*R+.2817188376*G+.6299787005*B),
+  L=1-(.2104542553*l+.793617785*m-.0040720468*s),A=1.9779984951*l-2.428592205*m+.4505937099*s,K=.0259040371*l+.7827717662*m-.808675766*s,
+  rgb=k=>{const a=A*k,b=K*k,x=(L+.3963377774*a+.2158037573*b)**3,y=(L-.1055613458*a-.0638541728*b)**3,z=(L-.0894841775*a-1.291485548*b)**3;return[4.0767416621*x-3.3077115913*y+.2309699292*z,-1.2684380046*x+2.6097574011*y-.3413193965*z,-.0041960863*x-.7034186147*y+1.707614701*z]};
+ const inG=v=>v.every(x=>x>=-1e-6&&x<=1+1e-6);let k=1,v=rgb(1);if(!inG(v)){let a=0,z=1;for(let i=0;i<16;i++){k=(a+z)/2;inG(rgb(k))?a=k:z=k}v=rgb(k=a)}
+ r='#'+v.map(x=>Math.round(enc(x)*255).toString(16).padStart(2,'0')).join('')+h.slice(6);dcM.set(c,r);return r}
+/* 화면 모드가 바뀌면(버튼·시스템 설정) html[data-theme] 를 맞추고, 색을 직접 칠한 것들을 다시 그림 */
+function applyTheme(){document.documentElement.dataset.theme=isDark()?'dark':'light';dcM.clear();S.nodes.forEach(n=>{if(n.t!='w'&&Object.hasOwn(els,n.id))upd(n)});drawLinks();if(pfId!=null)pfRender();if(ins.style.display=='block')panel();themeUi()}
+function setTheme(t){thm=t;try{localStorage.setItem('relmap_theme',t)}catch(e){}applyTheme()}
+function themeUi(){const b=$('#bth'),n={light:'라이트',dark:'다크',system:'시스템 설정'}[thm];b.querySelector('use').setAttribute('href','#i-'+{light:'sun',dark:'moon',system:'monitor'}[thm]);b.title='화면 모드: '+n}
+DKQ.addEventListener('change',()=>{if(thm=='system')applyTheme()});
 const nd=id=>S.nodes.find(n=>n.id==id),lk=id=>S.links.find(l=>l.id==id),obj=id=>nd(id)||lk(id);
 const sv=()=>{CB.q();clearTimeout(st);st=setTimeout(()=>{snap();if(!room)lsSet(KEY,JSON.stringify(S,(k,v)=>k[0]=='_'?undefined:v))},300)};
 
@@ -208,18 +281,20 @@ const sv=()=>{CB.q();clearTimeout(st);st=setTimeout(()=>{snap();if(!room)lsSet(K
 function mk(n){if(n.t=='w')return;const e=document.createElement('div');e.dataset.id=n.id;e.className='n '+n.t;W.appendChild(e);els[n.id]=e;if(HID.has(n.id))e.style.display='none';
  if(n.t=='p')e.innerHTML='<div class="im"></div><div class="ptx"><div class="nm"></div><div class="ds"></div></div>';
  if(n.t=='c')e.innerHTML='<div class="ct"></div><i class="rz"></i>';
- upd(n);CB.rs()}
+ upd(n);if(n.t=='c')ordG();CB.rs()}
 function clearDom(){W.querySelectorAll('.n,.lb').forEach(x=>x.remove());els={};lels={};hov=null}
 function upd(n){if(n.t=='w')return;CB.q();const e=els[n.id],s=e.style;s.left=n.x+'px';s.top=n.y+'px';
- if(n.t=='p'){ovq();const i=e.children[0];i.style.backgroundImage=n.img?`url(${n.img})`:'none';i.style.backgroundColor=n.col;i.textContent=n.img?'':(n.name||'?').trim().charAt(0);
+ if(n.t=='p'){ovq();const i=e.children[0];const u=pimg(n),d=2*ir(n);i.style.width=i.style.height=d+'px';i.style.fontSize=d*34/84+'px';e._pi=u;i.style.backgroundImage=u?`url(${u})`:'none';i.style.backgroundColor=dc(n.col);i.textContent=u?'':(n.name||'?').trim().charAt(0);
   e.querySelector('.nm').textContent=n.name;e.querySelector('.ds').textContent=n.desc}
- if(n.t=='t'){e.textContent=n.text||'텍스트';s.fontSize=n.size+'px';s.fontWeight=n.bold?700:400;s.color=n.col||'';s.letterSpacing=trk(n.size)+'em'}
- if(n.t=='c'){s.width=n.w+'px';s.height=n.h+'px';s.borderColor=n.col;s.background=`color-mix(in srgb,${n.col} ${n.op}%,transparent)`;s.setProperty('--gi',n.img?`url("${n.img}")`:'none');e.classList.toggle('gi',!!n.img);const ct=e.children[0];ct.textContent=n.title;ct.style.color=`color-mix(in srgb,${n.col} 75%,var(--ink))`;{const fs=Math.max(12,Math.min(n.w,n.h)*.06);ct.style.fontSize=fs+'px';ct.style.letterSpacing=trk(fs)+'em'}ct.style.top=n.h*.1+'px'}}
-const pk=x=>x.a<x.b?x.a+'|'+x.b:x.b+'|'+x.a,sz=n=>n.t=='c'?[n.w,n.h]:n.t=='p'?[84,84]:[els[n.id].offsetWidth,els[n.id].offsetHeight];
-const ctr=n=>n.t=='p'?[n.x+42+(n._dx||0),n.y+42+(n._dy||0)]:[n.x,n.y];
+ if(n.t=='t'){e.textContent=n.text||'텍스트';s.fontSize=n.size+'px';s.fontWeight=n.bold?700:400;s.color=dc(n.col)||'';s.letterSpacing=trk(n.size)+'em'}
+ if(n.t=='c'){s.width=n.w+'px';s.height=n.h+'px';const gc=dc(n.col);s.borderColor=gc;s.background=`color-mix(in srgb,${gc} ${n.op}%,transparent)`;s.setProperty('--gi',n.img?`url("${n.img}")`:'none');e.classList.toggle('gi',!!n.img);const ct=e.children[0];ct.textContent=n.title;ct.style.color=`color-mix(in srgb,${gc} 75%,var(--ink))`;{const fs=Math.max(12,Math.min(n.w,n.h)*.06);ct.style.fontSize=fs+'px';ct.style.letterSpacing=trk(fs)+'em'}ct.style.top=n.h*.1+'px'}}
+const ISZ=[[56,'작게'],[84,'중간'],[120,'크게']];/* 패널에서 고르는 아이콘 지름 3가지 */
+const ir=n=>(n.is||84)/2;/* 인물 아이콘 반지름(지름 is, 기본 84 면 저장 안 함) */
+const pk=x=>x.a<x.b?x.a+'|'+x.b:x.b+'|'+x.a,sz=n=>n.t=='c'?[n.w,n.h]:n.t=='p'?[2*ir(n),2*ir(n)]:[els[n.id].offsetWidth,els[n.id].offsetHeight];
+const ctr=n=>n.t=='p'?[n.x+ir(n)+(n._dx||0),n.y+ir(n)+(n._dy||0)]:[n.x,n.y];
 function drawLinks(){applyVis();let h='';const GM={};S.links.forEach(l=>(GM[pk(l)]=GM[pk(l)]||[]).push(l));
- S.links.forEach(l=>{const a=nd(l.a),b=nd(l.b);if(!a||!b)return;if(HID.has(l.id)){if(lels[l.id])lels[l.id].style.display='none';return}const[c1,c2]=[ctr(a),ctr(b)],on=sel==l.id,hv=hov&&(l.a==hov||l.b==hov),op=Math.min(1,(l.o??30)/100*(hov&&!hv?.35:1)+(on||hv?.3:0)),d=Math.hypot(c2[0]-c1[0],c2[1]-c1[1])||1,ux=(c2[0]-c1[0])/d,uy=(c2[1]-c1[1])/d,dr=l.dir||'to',fw=dr=='to'||dr=='both',bw=dr=='from'||dr=='both',hl=12+l.w*1.5,hw=5+l.w*1.1,g=GM[pk(l)],oo=(g.indexOf(l)-(g.length-1)/2)*Math.min(30,84/Math.max(1,g.length-1))*(l.a<l.b?1:-1),hh=Math.sqrt(Math.max(0,2304-oo*oo)),p=[c1[0]+ux*hh-uy*oo,c1[1]+uy*hh+ux*oo],q=[c2[0]-ux*hh-uy*oo,c2[1]-uy*hh+ux*oo],x1=p[0]+(bw?ux*hl:0),y1=p[1]+(bw?uy*hl:0),x2=q[0]-(fw?ux*hl:0),y2=q[1]-(fw?uy*hl:0),tri=(T,vx,vy)=>`<polygon points="${T[0]},${T[1]} ${T[0]-vx*hl-vy*hw},${T[1]-vy*hl+vx*hw} ${T[0]-vx*hl+vy*hw},${T[1]-vy*hl-vx*hw}" fill="${esc(l.col)}" fill-opacity="${op}"/>`;
-  h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${esc(l.col)}" stroke-opacity="${op}" stroke-dasharray="${l.dash?'10 14':'none'}" stroke-width="${+l.w||5}" stroke-linecap="round"/>${fw?tri(q,ux,uy):''}${bw?tri(p,-ux,-uy):''}<line data-id="${esc(l.id)}" x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="transparent" stroke-width="${Math.max(+l.w||5,18)}"/>`;
+ S.links.forEach(l=>{const a=nd(l.a),b=nd(l.b);if(!a||!b)return;if(HID.has(l.id)){if(lels[l.id])lels[l.id].style.display='none';return}const[c1,c2]=[ctr(a),ctr(b)],on=sel==l.id,hv=hov&&(l.a==hov||l.b==hov),op=Math.min(1,(l.o??30)/100*(hov&&!hv?.35:1)+(on||hv?.3:0)),d=Math.hypot(c2[0]-c1[0],c2[1]-c1[1])||1,ux=(c2[0]-c1[0])/d,uy=(c2[1]-c1[1])/d,dr=l.dir||'to',fw=dr=='to'||dr=='both',bw=dr=='from'||dr=='both',hl=12+l.w*1.5,hw=5+l.w*1.1,g=GM[pk(l)],oo=(g.indexOf(l)-(g.length-1)/2)*Math.min(30,84/Math.max(1,g.length-1))*(l.a<l.b?1:-1),ha=Math.sqrt(Math.max(0,(ir(a)+6)**2-oo*oo)),hb=Math.sqrt(Math.max(0,(ir(b)+6)**2-oo*oo)),p=[c1[0]+ux*ha-uy*oo,c1[1]+uy*ha+ux*oo],q=[c2[0]-ux*hb-uy*oo,c2[1]-uy*hb+ux*oo],x1=p[0]+(bw?ux*hl:0),y1=p[1]+(bw?uy*hl:0),x2=q[0]-(fw?ux*hl:0),y2=q[1]-(fw?uy*hl:0),tri=(T,vx,vy)=>`<polygon points="${T[0]},${T[1]} ${T[0]-vx*hl-vy*hw},${T[1]-vy*hl+vx*hw} ${T[0]-vx*hl+vy*hw},${T[1]-vy*hl-vx*hw}" fill="${esc(dc(l.col))}" fill-opacity="${op}"/>`;
+  h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${esc(dc(l.col))}" stroke-opacity="${op}" stroke-dasharray="${l.dash?'10 14':'none'}" stroke-width="${+l.w||5}" stroke-linecap="round"/>${fw?tri(q,ux,uy):''}${bw?tri(p,-ux,-uy):''}<line data-id="${esc(l.id)}" x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="transparent" stroke-width="${Math.max(+l.w||5,18)}"/>`;
   let e=lels[l.id];if(!e){e=lels[l.id]=document.createElement('div');e.className='lb';e.dataset.id=l.id;W.appendChild(e)}
   e.textContent=l.label;e.style.display=l.label?'':'none';e.style.left=(p[0]+q[0])/2+'px';e.style.top=(p[1]+q[1])/2+'px';e.classList.toggle('sel',on)});
  svg.innerHTML=h;ovq()}
@@ -231,20 +306,27 @@ function ovCheck(){const P=[];S.nodes.forEach(n=>{if(n.t!='p')return;const e=els
  L.forEach(([e,r])=>e.classList.toggle('ov',!!r&&P.some(q=>r[0]<q[0]+q[2]&&q[0]<r[0]+r[2]&&r[1]<q[1]+q[3]&&q[1]<r[1]+r[3])))}
 
 /* 화면 */
-function applyView(){const v=S.view;W.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.k})`;{const was=cv.classList.contains('lod');cv.classList.toggle('lod',v.k<.6);if(was!==(v.k<.6))ovq()}
+let fly=0;/* 부드러운 이동(flyTo)이 진행 중인지 가리키는 번호: 휠·끌기·전체 보기가 올리면 멈춤 */
+const RZQ=matchMedia('(pointer:coarse),(max-width:640px)');RZQ.addEventListener('change',()=>applyView());/* 손가락 화면·좁은 화면에선 그룹 크기 핸들을 더 크게 */
+function applyView(){const v=S.view;W.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.k})`;W.style.setProperty('--rs',(RZQ.matches?28:16)*Math.max(.6,v.k**.5)/v.k+'px');/* 핸들의 화면 크기 = 기본값 × 확대 배율의 제곱근(.6배 아래로는 안 줄어듦): 확대하면 커지고 축소하면 작아지되, 배율을 그대로 따라가진 않음 */W.style.setProperty('--rb',2/v.k+'px');
+ {const lf=(RZQ.matches?1.15:1)*Math.max(.6,v.k**.5)/v.k;if(W._lf!==lf){W._lf=lf;W.style.setProperty('--lf',lf);ovq()}}/* 관계선 글자(.lb)도 핸들처럼 화면 크기가 배율의 제곱근만 따라가고(.6배 아래로는 안 줄어듦), 좁은·손가락 화면에선 1.15배. 크기가 바뀌면 겹침 검사를 다시 함 */
+ {const was=cv.classList.contains('lod');cv.classList.toggle('lod',v.k<.6);if(was!==(v.k<.6))ovq()}
  cv.style.backgroundPosition=`${v.x}px ${v.y}px`;cv.style.backgroundSize=`${24*v.k}px ${24*v.k}px`;$('#zl').textContent=Math.round(v.k*100)+'%';sv()}
-function zoomAt(cx,cy,f){const r=cv.getBoundingClientRect(),v=S.view,k=clamp(v.k*f,.08,3);f=k/v.k;const px=cx-r.left,py=cy-r.top;v.x=px-(px-v.x)*f;v.y=py-(py-v.y)*f;v.k=k;applyView()}
-function fit(){const v=S.view=S.view||{x:0,y:0,k:1};if(!S.nodes.some(n=>n.t!='w'&&!HID.has(n.id))){v.x=cv.clientWidth/2;v.y=cv.clientHeight/2;v.k=1;return applyView()}
+function zoomAt(cx,cy,f){fly++;const r=cv.getBoundingClientRect(),v=S.view,k=clamp(v.k*f,.08,3);f=k/v.k;const px=cx-r.left,py=cy-r.top;v.x=px-(px-v.x)*f;v.y=py-(py-v.y)*f;v.k=k;applyView()}
+function fit(){fly++;const v=S.view=S.view||{x:0,y:0,k:1};if(!S.nodes.some(n=>n.t!='w'&&!HID.has(n.id))){v.x=cv.clientWidth/2;v.y=cv.clientHeight/2;v.k=1;return applyView()}
  let a=1e9,b=1e9,c=-1e9,d=-1e9;S.nodes.forEach(n=>{if(n.t=='w'||HID.has(n.id))return;const[w,h]=sz(n);a=Math.min(a,n.x);b=Math.min(b,n.y);c=Math.max(c,n.x+w);d=Math.max(d,n.y+h)});
  const r=cv.getBoundingClientRect(),k=clamp(Math.min((r.width-140)/(c-a),(r.height-180)/(d-b)),.08,1);v.k=k;v.x=r.width/2-(a+c)/2*k;v.y=r.height/2+20-(b+d)/2*k;applyView()}
 const cen=()=>{const r=cv.getBoundingClientRect(),v=S.view;return[(r.width/2-v.x)/v.k,(r.height/2-v.y)/v.k]};
+/* 부드러운 이동: 화면 가운데에 오는 좌표는 직선으로, 배율은 로그 비율로 같이 바꿈(줌인·줌아웃이 자연스럽게). 움직임 줄이기 설정이면 바로 이동 */
+function flyTo(cx,cy,k,ms=550){const id=++fly,[x0,y0]=cen(),k0=S.view.k,t0=performance.now(),dur=matchMedia('(prefers-reduced-motion:reduce)').matches?0:ms;
+ const step=now=>{if(id!==fly)return;const t=dur?Math.min(1,(now-t0)/dur):1,e=t<.5?2*t*t:1-(-2*t+2)**2/2,kk=k0*(k/k0)**e,r=cv.getBoundingClientRect(),v=S.view;v.k=kk;v.x=r.width/2-(x0+(cx-x0)*e)*kk;v.y=r.height/2-(y0+(cy-y0)*e)*kk;applyView();if(t<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
 
 /* 추가 / 삭제 / 선택 */
 function add(n){n.id=uid();S.nodes.push(n);mk(n);select(n.id);sv();heat(.8);return n}
 function addNode(t,at){const[cx,cy]=at||cen(),j=()=>(Math.random()-.5)*80;
  if(t=='p')add({t:'p',x:cx-42+j(),y:cy-42+j(),name:'새 인물',desc:'',img:'',col:pc()});
  if(t=='t')add({t:'t',x:cx-40+j(),y:cy-14+j(),text:'텍스트',size:22,bold:false,col:''});
- if(t=='c'){const n=add({t:'c',x:cx-210,y:cy-210,w:420,h:420,title:'그룹',col:pc(),op:8,m:[],ph:true});n.m=S.nodes.filter(p=>p.t=='p'&&inside(n,p)).map(p=>p.id)}}
+ if(t=='c'){const n=add({t:'c',x:cx-210,y:cy-210,w:420,h:420,title:'그룹',col:pc(),op:8,m:[],ph:true});n.m=S.nodes.filter(p=>p.t=='p'&&inside(n,p)).map(p=>p.id);joinG(n)}}
 function delOne(id){if(!obj(id))return;
  if(lk(id)){S.links=S.links.filter(l=>l.id!=id);lels[id]?.remove();delete lels[id]}
  else{S.links.filter(l=>l.a==id||l.b==id).forEach(l=>{lels[l.id]?.remove();delete lels[l.id]});S.links=S.links.filter(l=>l.a!=id&&l.b!=id);S.nodes=S.nodes.filter(n=>n.id!=id);S.nodes.forEach(c=>{if(c.m)c.m=c.m.filter(i=>i!=id)});els[id].remove();delete els[id];hov=null;Object.values(els).forEach(e=>e.classList.remove('dim'));heat(.6)}}
@@ -255,107 +337,194 @@ function endConn(){connMode=false;conn=null;cv.classList.remove('cm');$('#bc').c
 function startConn(){connMode=true;conn=nd(sel)?.t=='p'?sel:null;cv.classList.add('cm');$('#bc').classList.add('on');$('#bc .bt').textContent='연결할 인물 두 명 클릭';if(conn)els[conn].classList.add('sel2')}
 
 /* 이미지 */
-function readImg(f,big){return new Promise(r=>{const im=new Image();im.onload=()=>{if(big){const k=Math.min(1,640/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(im.src);r(c.toDataURL('image/jpeg',.82));return}const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=256;
- c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)*.25,s,s,0,0,256,256);URL.revokeObjectURL(im.src);r(c.toDataURL('image/jpeg',.85))};im.src=URL.createObjectURL(f)})}
-function pickImg(n){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){n.img=await readImg(f.files[0],n.t=='c');upd(n);sv();if(sel==n.id)panel()}};f.click()}
+function readImg(f,big){return new Promise(r=>{const im=new Image();im.onload=()=>{if(big){const k=Math.min(1,640/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(im.src);r(upImg(c.toDataURL('image/jpeg',.82)));return}const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=256;
+ c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)*.25,s,s,0,0,256,256);URL.revokeObjectURL(im.src);r(upImg(c.toDataURL('image/jpeg',.85)))};im.src=URL.createObjectURL(f)})}
+function pickImg(n){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){const d=await readImg(f.files[0],n.t=='c');if(!d)return;n.img=d;upd(n);sv();if(sel==n.id)panel()}};f.click()}
+function pickIm(n){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){const d=await readImg(f.files[0]);if(!d)return;(n.im=n.im||[]).push({img:d,g:''});sv();if(sel==n.id)panel()}};f.click()}
 cv.addEventListener('dragover',e=>e.preventDefault());
 cv.addEventListener('drop',e=>{e.preventDefault();if(mode!='e')return;const r=cv.getBoundingClientRect(),v=S.view;
- [...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')).forEach(async(f,i)=>{const d=await readImg(f);
+ [...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')).forEach(async(f,i)=>{const d=await readImg(f);if(!d)return;
   const n=add({t:'p',x:(e.clientX-r.left-v.x)/v.k-42+i*100,y:(e.clientY-r.top-v.y)/v.k-42,name:f.name.replace(/\.[^.]+$/,''),desc:'',img:d,col:pc()});upd(n)})});
 
 /* 작품·태그: 작품은 t='w' 노드로 저장(화면엔 안 그림, 서버 표 구조 변경 없음). 영화 kind='m', 드라마 kind='s' + 에피소드 수 n.
    태그 tg = 인물·선이 등장하는 작품의 id 목록: 영화는 작품 id, 드라마는 에피소드별 id(`작품id_번호`). */
 /* 읽기 모드 스포일러 숨김: 태그가 있는데 하나도 안 본 인물·선, 멤버가 전부 숨은 그룹은 아예 안 그림(편집·이동 모드는 전부 보임).
    '본 작품'(WS)은 보는 사람 브라우저에만 저장(관계도별). 서버·파일에는 안 들어가므로 동기화·저장 형식과 무관. */
-const HID=new Set(),wwOpen=new Set(),wxOpen=new Set();let WS=new Set();
-const wsKey=()=>'relmap_watch_'+(rid||'local'),wsSave=()=>lsSet(wsKey(),JSON.stringify([...WS])),epName=(w,i)=>(w.en&&w.en[i-1])||i+'화';
-function wsLoad(){try{WS=new Set(JSON.parse(lsGet(wsKey())||'[]').filter(idOk))}catch(e){WS=new Set()}}
+const HID=new Set(),wwOpen=new Set(),wxOpen=new Set();let WS=new Set(),curPre='',PS={};
+const wsKey=()=>'relmap_watch_'+(rid||'local'),wsSave=()=>lsSet(wsKey(),JSON.stringify([...WS])),psKey=()=>'relmap_stage_'+(rid||'local'),psSave=()=>lsSet(psKey(),JSON.stringify(PS)),epName=(w,i)=>(w.en&&w.en[i-1])||i+'화';
+function wsLoad(){try{WS=new Set(JSON.parse(lsGet(wsKey())||'[]').filter(idOk))}catch(e){WS=new Set()}const c=lsGet(cpKey())||'';curPre=idOk(c)?c:'';
+ PS={};try{const o=JSON.parse(lsGet(psKey())||'{}');for(const k in o)if(idOk(k)&&(o[k]=='_base'||idOk(o[k])))PS[k]=o[k]}catch(e){}}
 function calcVis(){const n=new Set();if(mode!='r')return n;const L=WK();if(!L.length)return n;
  const valid=new Set(L.flatMap(tagIds)),seen=o=>{const t=(o.tg||[]).filter(i=>valid.has(i));return !t.length||t.some(i=>WS.has(i))};
  S.nodes.forEach(p=>{if(p.t=='p'&&!seen(p))n.add(p.id)});
  S.links.forEach(l=>{if(!seen(l)||n.has(l.a)||n.has(l.b))n.add(l.id)});
- S.nodes.forEach(c=>{if(c.t!='c'||!c.m)return;const M=c.m.filter(i=>nd(i)&&nd(i).t=='p');if(M.length&&M.every(i=>n.has(i)))n.add(c.id)});return n}
-function applyVis(){const n=calcVis();let ch=n.size!=HID.size;if(!ch)for(const i of n)if(!HID.has(i)){ch=true;break}if(!ch)return;
+ S.nodes.filter(c=>c.t=='c'&&c.m).sort((a,b)=>a.w*a.h-b.w*b.h).forEach(c=>{const M=c.m.filter(i=>nd(i)&&(nd(i).t=='p'||nd(i).t=='c'));if(M.length&&M.every(i=>n.has(i)))n.add(c.id)});return n}
+function applyVis(){S.nodes.forEach(p=>{if(p.t=='p'&&els[p.id]&&els[p.id]._pi!==pimg(p))upd(p)});const n=calcVis();let ch=n.size!=HID.size;if(!ch)for(const i of n)if(!HID.has(i)){ch=true;break}if(!ch)return;
  const old=new Set(HID);HID.clear();n.forEach(i=>HID.add(i));new Set([...old,...n]).forEach(i=>{if(els[i])els[i].style.display=HID.has(i)?'none':''});
  if(sel&&HID.has(sel))select(null)}
-const WK=()=>S.nodes.filter(n=>n.t=='w').sort((a,b)=>a.ord-b.ord||(a.id<b.id?-1:1)),
+/* 작품 노드(t='w')의 종류: 'm' 영화 / 's' 드라마 / 'q' 카테고리 프리셋(묶음) / 'k' 카테고리(pre=프리셋 id).
+   작품(m·s)의 선택 필드: imp 중요도 1·2(글자 굵기·크기), emo 앞에 붙일 이모지(3글자까지), cat 속한 카테고리 id 목록(여러 개 가능).
+   지금 보는 프리셋 curPre 는 보는 사람 브라우저에만 저장(WS 처럼). */
+const byOrd=(a,b)=>a.ord-b.ord||(a.id<b.id?-1:1),wK=k=>S.nodes.filter(n=>n.t=='w'&&k.includes(n.kind)).sort(byOrd),
+ WK=()=>wK('ms'),PR=()=>wK('q'),CK=p=>wK('k').filter(c=>c.pre==p),
+ wt=w=>(w.emo?w.emo+' ':'')+(w.title||'이름 없음'),wn=w=>`<span class="wi${w.imp|0}">${esc(wt(w))}</span>`,ckOpen=new Set(),
+ cpKey=()=>'relmap_preset_'+(rid||'local'),setPre=id=>{curPre=id;lsSet(cpKey(),id)},curP=()=>PR().some(q=>q.id==curPre)?curPre:'',
  tagIds=w=>w.kind=='s'?Array.from({length:w.n||1},(_,i)=>w.id+'_'+(i+1)):[w.id],tgOpen=new Set(),wk=$('#wk'),
  dropTags=f=>[...S.nodes,...S.links].forEach(o=>{if(o.tg&&o.tg.some(f))o.tg=o.tg.filter(i=>!f(i))});
+let tgDd=false;
 function tags(o){const L=WK();if(!L.length)return '<label>등장 작품: 툴바의 “작품”에서 먼저 영화·드라마를 만드세요.</label>';const T=new Set(o.tg||[]);
- return '<label>등장 작품</label>'+L.map(w=>{const nmx=esc(w.title||'이름 없음');if(w.kind!='s')return `<label class="tg"><input type="checkbox" data-tg="${esc(w.id)}" ${T.has(w.id)?'checked':''}> ${nmx}</label>`;
+ return '<label>등장 작품</label><button class="dd" data-tgd aria-expanded="'+tgDd+'"><span>'+(tagSum(o)||'선택 안 함')+'</span><span aria-hidden="true">'+(tgDd?'▴':'▾')+'</span></button>'+(!tgDd?'':'<div class="ddl">'+L.map(w=>{const nmx=wn(w);if(w.kind!='s')return `<label class="tg"><input type="checkbox" data-tg="${esc(w.id)}" ${T.has(w.id)?'checked':''}> ${nmx}</label>`;
   const ids=tagIds(w),c=ids.filter(i=>T.has(i)).length;
   return `<div class="tg"><input type="checkbox" data-tgw="${esc(w.id)}" data-c="${c}" data-n="${ids.length}" ${c==ids.length?'checked':''}><button data-tgx="${esc(w.id)}">${tgOpen.has(w.id)?'▾':'▸'} ${nmx} (${c}/${ids.length})</button></div>`
-   +(tgOpen.has(w.id)?'<div class="eps">'+ids.map((i,k)=>`<label><input type="checkbox" data-tg="${esc(i)}" ${T.has(i)?'checked':''}>${esc(epName(w,k+1))}</label>`).join('')+'</div>':'')}).join('')}
-function tagText(o){const T=new Set((o.tg||[]).filter(i=>mode!='r'||WS.has(i))),a=WK().map(w=>{if(w.kind!='s')return T.has(w.id)?esc(w.title):'';const ids=tagIds(w),e=ids.map((i,k)=>T.has(i)?epName(w,k+1):'').filter(Boolean);return !e.length?'':e.length==ids.length?esc(w.title)+' 전체':esc(w.title)+' '+e.map(esc).join('·')}).filter(Boolean);return a.length?'<label>등장: '+a.join(', ')+'</label>':''}
+   +(tgOpen.has(w.id)?'<div class="eps">'+ids.map((i,k)=>`<label><input type="checkbox" data-tg="${esc(i)}" ${T.has(i)?'checked':''}>${esc(epName(w,k+1))}</label>`).join('')+'</div>':'')}).join('')+'</div>')}
+function tagText(o){const s=tagSum(o);return s?'<label>등장: '+s+'</label>':''}
+function tagSum(o){const T=new Set((o.tg||[]).filter(i=>mode!='r'||WS.has(i))),a=WK().map(w=>{if(w.kind!='s')return T.has(w.id)?esc(wt(w)):'';const ids=tagIds(w),e=ids.map((i,k)=>T.has(i)?epName(w,k+1):'').filter(Boolean);return !e.length?'':e.length==ids.length?esc(wt(w))+' 전체':esc(wt(w))+' '+e.map(esc).join('·')}).filter(Boolean);return a.join(', ')}
 /* 인물의 추가 설명(dx): 읽기 모드는 g 를 본 것만(없어진 작품이면 계속 숨김), 편집 모드는 입력칸+공개 조건 선택 */
-const dxv=o=>{const V=new Set(WK().flatMap(tagIds));return(o.dx||[]).filter(x=>x.t&&(!x.g||V.has(x.g)&&WS.has(x.g))).map(x=>`<label style="white-space:pre-wrap">${esc(x.t)}</label>`).join('')};
-function dxEdit(o){const L=WK(),V=new Set(L.flatMap(tagIds)),op=(v,t,g)=>`<option value="${esc(v)}" ${v==g?'selected':''}>${esc(t)}</option>`;
- return '<label>시청에 따라 보이는 설명</label>'+(o.dx||[]).map((x,i)=>`<label>설명 ${i+1}<textarea data-dx="${i}">${esc(x.t)}</textarea></label><label>이 작품을 본 뒤에 보여요<select data-dg="${i}">${op('','항상 보여요',x.g)}${x.g&&!V.has(x.g)?op(x.g,'삭제된 작품',x.g):''}${L.map(w=>w.kind=='s'?tagIds(w).map((t,k)=>op(t,(w.title||'이름 없음')+' '+epName(w,k+1),x.g)).join(''):op(w.id,w.title||'이름 없음',x.g)).join('')}</select></label><div class="row"><button class="danger" data-a="dxd" data-i="${i}">설명 삭제</button></div>`).join('')+'<div class="row"><button data-a="dxa">+ 설명 추가</button></div>'}
+/* 보는 시점 PS(인물별, 이 브라우저에만 저장): 읽기 모드에서 '지금까지 본 것 전부'(기본) / '처음 모습'('_base') / 본 작품·에피소드까지 중에서 골라
+   그 시점까지의 사진·추가 설명만 봄. 작품 순서는 작품 ord, 같은 드라마는 회차 번호. 안 본 작품은 목록에 안 나옴 */
+const gKey=g=>{for(const w of WK()){if(g==w.id)return[w.ord,0];if(g.startsWith(w.id+'_')){const n=+g.slice(w.id.length+1);if(n>=1)return[w.ord,n]}}return null},gCmp=(a,b)=>a[0]-b[0]||a[1]-b[1],
+ stages=o=>{const V=new Set(WK().flatMap(tagIds));return[...new Set([...(o.im||[]),...(o.dx||[])].map(x=>x.g).filter(g=>g&&V.has(g)&&WS.has(g)))].sort((a,b)=>gCmp(gKey(a),gKey(b)))},
+ stageOf=o=>{const s=PS[o.id];return s=='_base'||s&&stages(o).includes(s)?s:''},
+ gShow=(o,g,V)=>{if(!g)return true;if(!V.has(g)||!WS.has(g))return false;const s=stageOf(o);return !s||s!='_base'&&gCmp(gKey(g),gKey(s))<=0},
+ gLabel=g=>{for(const w of WK()){if(g==w.id)return wt(w);if(g.startsWith(w.id+'_'))return wt(w)+' '+epName(w,+g.slice(w.id.length+1))}return''},
+ stSel=o=>{const L=stages(o);if(!L.length)return'';const s=stageOf(o),op=(v,t)=>`<option value="${esc(v)}" ${v==s?'selected':''}>${esc(t)}</option>`;return`<label class="pf-v">보는 시점<select data-ps>${op('','지금까지 본 것 전부')}${op('_base','처음 모습')}${L.map(g=>op(g,gLabel(g)+'까지')).join('')}</select></label>`};
+const dxv=o=>{const V=new Set(WK().flatMap(tagIds));return(o.dx||[]).filter(x=>x.t&&gShow(o,x.g,V)).map(x=>`<label style="white-space:pre-wrap">${esc(x.t)}</label>`).join('')};
+const gSel=(a,i,g,f)=>{const L=WK(),V=new Set(L.flatMap(tagIds)),op=(v,t)=>`<option value="${esc(v)}" ${v==g?'selected':''}>${esc(t)}</option>`;
+ return `<select data-${a}="${i}">${op('',f)}${g&&!V.has(g)?op(g,'삭제된 작품'):''}${L.map(w=>w.kind=='s'?tagIds(w).map((t,k)=>op(t,wt(w)+' '+epName(w,k+1))).join(''):op(w.id,wt(w))).join('')}</select>`};
+function dxEdit(o){return '<label>시청에 따라 보이는 설명</label>'+(o.dx||[]).map((x,i)=>`<label>설명 ${i+1}<textarea data-dx="${i}">${esc(x.t)}</textarea></label><label>이 작품을 본 뒤에 보여요${gSel('dg',i,x.g,'항상 보여요')}</label><div class="row"><button class="danger" data-a="dxd" data-i="${i}">설명 삭제</button></div>`).join('')+'<div class="row"><button data-a="dxa">+ 설명 추가</button></div>'}
+/* 인물 사진 버전(im): 읽기 모드에선 본 작품에 걸린 것 중 마지막 사진, 없으면 기본 사진 img. 편집 모드는 기본 사진 */
+const pimg=n=>{if(mode!='r'||!n.im)return n.img;const V=new Set(WK().flatMap(tagIds));let r=n.img;for(const x of n.im)if(x.img&&x.g&&gShow(n,x.g,V))r=x.img;return r};
+const imEdit=o=>'<label>시청에 따라 바뀌는 사진</label><label>여러 장이면 아래쪽 사진이 먼저 보여요.</label>'+(o.im||[]).map((x,i)=>`<div class="ver">${x.img?`<img class="vp" src="${esc(x.img)}" alt="">`:''}<label>이 작품을 본 뒤에 바뀌어요${gSel('ig',i,x.g,'작품 선택')}</label><div class="row"><button class="danger" data-a="imd" data-i="${i}">사진 삭제</button></div></div>`).join('')+((o.im||[]).length<12?'<div class="row"><button data-a="ima">+ 사진 추가</button></div>':'');
+/* n각형 스탯(st): 항목 이름·값(0~10) NMIN~NMAX(3~12)개, 항목 수 n 은 st.length */
+const NMIN=3,NMAX=12;
+function polySvg(o){const st=o.st,N=st.length,R=56,P=(k,r)=>[100+r*Math.cos(Math.PI*(k*360/N-90)/180),100+r*Math.sin(Math.PI*(k*360/N-90)/180)],f=a=>a.map(v=>v.toFixed(1)).join(','),ring=r=>st.map((_,k)=>f(P(k,r))).join(' ');
+ return `<svg class="hx" viewBox="-50 -8 300 216" role="img" aria-label="${esc('능력치: '+st.map(x=>x.n+' '+x.v).join(', '))}">${[.2,.4,.6,.8,1].map(g=>`<polygon class="hg" points="${ring(R*g)}"/>`).join('')}${st.map((_,k)=>{const q=P(k,R);return`<line class="hg" x1="100" y1="100" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}"/>`}).join('')}<polygon points="${st.map((x,k)=>f(P(k,R*x.v/10))).join(' ')}" fill="${esc(dc(o.col))}" fill-opacity=".28" stroke="${esc(dc(o.col))}" stroke-width="2" stroke-linejoin="round"/>${st.map((x,k)=>{const q=P(k,R+14);return`<text class="ht" x="${q[0].toFixed(1)}" y="${q[1].toFixed(1)}" text-anchor="${q[0]<95?'end':q[0]>105?'start':'middle'}" dominant-baseline="middle">${esc(x.n)} ${x.v}</text>`}).join('')}</svg>`}
+/* 새 스탯의 기본 항목(이름 NMIN~NMAX개): 문서 안의 t='w' kind='h' 노드(names)에 저장해 같은 방 사람들과 공유, 없으면 DEFN(6개) */
+const DEFN=['힘','지능','매력','민첩','체력','의지'],SD=()=>wK('h')[0],sNames=()=>{const d=SD();return d&&d.names||DEFN},nameAt=i=>DEFN[i]||'항목'+(i+1);let sdOpen=false;
+const stResize=(o,n)=>{const L=o.st.slice(0,n),D=sNames();while(L.length<n)L.push({n:(D[L.length]??nameAt(L.length)).slice(0,6),v:5});o.st=L;sv()},/* 항목을 늘리면 기본 항목 이름·값 5 로 채우고, 줄이면 뒤에서부터 뺌 */
+ sdResize=n=>{let d=SD();if(!d){d={id:uid(),t:'w',x:0,y:0,title:'',kind:'h',names:[...DEFN],ord:0};S.nodes.push(d)}d.names=Array.from({length:n},(_,i)=>d.names[i]??nameAt(i));sv()},
+ nCnt=(attr,n,label)=>`<div class="wr"><span>항목 수</span><input type="number" ${attr} min="${NMIN}" max="${NMAX}" step="1" value="${n}" aria-label="${label}" style="width:76px"><span>${NMIN}~${NMAX}</span></div>`;
+const sdEdit=()=>`<div class="tg"><button data-a="sdo">${sdOpen?'▾':'▸'} 새 스탯의 기본 항목 설정</button></div>`+(sdOpen?'<label>새로 만드는 스탯에 쓸 항목이에요. 이미 만든 스탯은 안 바뀌어요.</label>'+nCnt('data-sdn',sNames().length,'기본 항목 수')+sNames().map((n,i)=>`<input type="text" data-sd="${i}" value="${esc(n)}" maxlength="6" aria-label="기본 항목 ${i+1}">`).join('')+'<div class="row"><button data-a="sdr">처음 값으로</button></div>':'');
+const stEdit=o=>'<label>'+(o.st?o.st.length+'각형 스탯':'다각형 스탯')+'</label>'+(o.st?`<div id="hxp">${polySvg(o)}</div>`+nCnt('data-nn',o.st.length,'항목 수')+o.st.map((x,i)=>`<div class="wr"><input type="text" data-sn="${i}" value="${esc(x.n)}" maxlength="6" aria-label="항목 ${i+1} 이름" style="width:84px;margin:0"><input type="range" data-sv="${i}" min="0" max="10" value="${x.v}" aria-label="항목 ${i+1} 값" style="flex:1;width:auto;margin:0"><span>${x.v}</span></div>`).join('')+'<div class="row"><button class="danger" data-a="std">스탯 삭제</button></div>':'<div class="row"><button data-a="sta">+ 다각형 스탯 추가</button></div>')+sdEdit();
 function setTag(id,wid,on){const o=obj(sel);if(!o)return;const T=new Set(o.tg||[]);
  if(wid!=null){const w=nd(wid);if(w)tagIds(w).forEach(i=>on?T.add(i):T.delete(i))}else on?T.add(id):T.delete(id);o.tg=[...T];sv();panel()}
-function renderWk(){const st=wk.scrollTop;
- if(mode=='r'){const L=WK();wk.innerHTML='<h3>내가 본 작품</h3><label>체크한 작품만 보여요. 안 본 작품에만 나오는 인물·관계는 숨겨져요.</label>'+(L.map(w=>{const nmx=esc(w.title||'이름 없음');if(w.kind!='s')return `<label class="tg"><input type="checkbox" data-ww="${esc(w.id)}" ${WS.has(w.id)?'checked':''}> ${nmx}</label>`;
+/* 작품 목록 창: 읽기 모드 = 본 작품 체크(프리셋을 고르면 카테고리별로 묶어 펼침), 편집 모드 = 작품 편집 + 카테고리 프리셋·카테고리 편집 */
+const qSel=(Q,pre,none)=>`<label>카테고리 프리셋<select data-qs><option value="">${none}</option>${Q.map(q=>`<option value="${esc(q.id)}" ${q.id==pre?'selected':''}>${esc(q.title||'이름 없음')}</option>`).join('')}</select></label>`;
+function renderWk(){const st=wk.scrollTop,L=WK(),Q=PR(),pre=curP(),cats=pre?CK(pre):[],has=(w,c)=>(w.cat||[]).includes(c.id);
+ if(mode=='r'){
+  const row=w=>{const nmx=wn(w);if(w.kind!='s')return `<label class="tg"><input type="checkbox" data-ww="${esc(w.id)}" ${WS.has(w.id)?'checked':''}> ${nmx}</label>`;
    const ids=tagIds(w),c=ids.filter(i=>WS.has(i)).length;return `<div class="tg"><input type="checkbox" data-wwp="${esc(w.id)}" data-c="${c}" data-n="${ids.length}" ${c==ids.length?'checked':''}><button data-wwx="${esc(w.id)}">${wwOpen.has(w.id)?'▾':'▸'} ${nmx} (${c}/${ids.length})</button></div>`
-    +(wwOpen.has(w.id)?'<div class="eps">'+ids.map((i,k)=>`<label><input type="checkbox" data-ww="${esc(i)}" ${WS.has(i)?'checked':''}>${esc(epName(w,k+1))}</label>`).join('')+'</div>':'')}).join('')||'<label>이 관계도에는 아직 작품이 없어요.</label>')+'<div class="row"><button data-wa="all">모두 봤어요</button><button data-wa="none">모두 해제</button><button data-wa="x">닫기</button></div>';
+    +(wwOpen.has(w.id)?'<div class="eps">'+ids.map((i,k)=>`<label><input type="checkbox" data-ww="${esc(i)}" ${WS.has(i)?'checked':''}>${esc(epName(w,k+1))}</label>`).join('')+'</div>':'')},
+   sec=(id,t,ws)=>`<div class="tg"><button data-ckx="${esc(id)}">${ckOpen.has(id)?'▾':'▸'} ${esc(t)} (${ws.length})</button></div>`+(ckOpen.has(id)?'<div class="ck">'+ws.map(row).join('')+'</div>':''),
+   none=L.filter(w=>!cats.some(c=>has(w,c)));
+  wk.innerHTML='<h3>내가 본 작품</h3><label>체크한 작품만 보여요. 안 본 작품에만 나오는 인물·관계는 숨겨져요.</label>'+(Q.length?qSel(Q,pre,'프리셋 없이 모두 보기'):'')
+   +((pre?cats.map(c=>sec(c.id,c.title||'이름 없음',L.filter(w=>has(w,c)))).join('')+(none.length?sec('_none','미분류',none):''):L.map(row).join(''))||'<label>이 관계도에는 아직 작품이 없어요.</label>')+'<div class="row"><button data-wa="all">모두 봤어요</button><button data-wa="none">모두 해제</button><button data-wa="x">닫기</button></div>';
   wk.querySelectorAll('[data-wwp]').forEach(x=>x.indeterminate=+x.dataset.c>0&&+x.dataset.c<+x.dataset.n)}
- else wk.innerHTML='<h3>작품</h3>'+(WK().map(w=>`<div class="wr"><span>${w.kind=='s'?'드라마':'영화'}</span><input type="text" data-wt="${esc(w.id)}" value="${esc(w.title)}" maxlength="100">${w.kind=='s'?`<input type="number" min="1" max="500" data-wn="${esc(w.id)}" value="${w.n||1}" title="에피소드 수"><span>화</span>`:''}<button class="danger" data-wd="${esc(w.id)}">삭제</button></div>`
-  +(w.kind=='s'?`<div class="tg"><button data-wex="${esc(w.id)}">${wxOpen.has(w.id)?'▾':'▸'} 에피소드 이름</button></div>`+(wxOpen.has(w.id)?'<div class="wn">'+Array.from({length:w.n||1},(_,k)=>`<input type="text" data-we="${esc(w.id)}" data-i="${k}" placeholder="${k+1}화" value="${esc((w.en&&w.en[k])||'')}" maxlength="100">`).join('')+'</div>':''):'')).join('')||'<label>아직 작품이 없어요. 아래에서 영화나 드라마를 추가하세요.</label>')+'<div class="row"><button data-wa="m">+ 영화</button><button data-wa="s">+ 드라마</button><button data-wa="x">닫기</button></div>';
+ else{
+  const ttl=(w,l,x)=>`<div class="wr"><span>${l}</span><input type="text" data-wt="${esc(w.id)}" value="${esc(w.title)}" maxlength="100">${x||''}<button class="danger" data-wd="${esc(w.id)}">삭제</button></div>`,
+   opt=(v,t,s)=>`<option value="${v}" ${s?'selected':''}>${t}</option>`;
+  wk.innerHTML='<h3>작품</h3>'+(L.map(w=>ttl(w,w.kind=='s'?'드라마':'영화',w.kind=='s'?`<input type="number" min="1" max="500" data-wn="${esc(w.id)}" value="${w.n||1}" title="에피소드 수"><span>화</span>`:'')
+   +`<div class="wr"><span>표시</span><input type="text" data-wo="${esc(w.id)}" value="${esc(w.emo)}" placeholder="앞에 붙일 이모지" style="flex:1 1 auto"><select data-wi="${esc(w.id)}" aria-label="중요도">${opt(0,'보통',!w.imp)}${opt(1,'중요',w.imp==1)}${opt(2,'아주 중요',w.imp==2)}</select></div>`
+   +(w.kind=='s'?`<div class="tg"><button data-wex="${esc(w.id)}">${wxOpen.has(w.id)?'▾':'▸'} 에피소드 이름</button></div>`+(wxOpen.has(w.id)?'<div class="wn">'+Array.from({length:w.n||1},(_,k)=>`<input type="text" data-we="${esc(w.id)}" data-i="${k}" placeholder="${k+1}화" value="${esc((w.en&&w.en[k])||'')}" maxlength="100">`).join('')+'</div>':''):'')).join('')||'<label>아직 작품이 없어요. 아래에서 영화나 드라마를 추가하세요.</label>')
+   +'<div class="row"><button data-wa="m">+ 영화</button><button data-wa="s">+ 드라마</button></div>'
+   +'<h3 style="margin-top:16px">카테고리</h3><label>프리셋을 만들어 카테고리를 묶어 두고, 읽기 모드 작품 목록에서 골라 볼 수 있어요. 한 작품을 여러 카테고리에 넣을 수 있어요.</label>'+qSel(Q,pre,'프리셋 선택')
+   +(pre?ttl(nd(pre),'프리셋')+cats.map(c=>ttl(c,'카테고리')+`<div class="tg"><button data-ckx="${esc(c.id)}">${ckOpen.has(c.id)?'▾':'▸'} 작품 지정 (${L.filter(w=>has(w,c)).length}/${L.length})</button></div>`
+    +(ckOpen.has(c.id)?'<div class="ck">'+(L.map(w=>`<label class="tg"><input type="checkbox" data-wc="${esc(w.id)}" data-cc="${esc(c.id)}" ${has(w,c)?'checked':''}> ${wn(w)}</label>`).join('')||'<label>먼저 작품을 추가하세요.</label>')+'</div>':'')).join('')+'<div class="row"><button data-wa="k">+ 카테고리</button></div>':'')
+   +'<div class="row"><button data-wa="q">+ 프리셋</button><button data-wa="x">닫기</button></div>'}
  wk.scrollTop=st}
 /* 상단바 버튼을 누르면 그 버튼 바로 아래에 드롭다운으로 뜸(화면 밖으로 안 나가게 좌우를 맞추고, 높이는 남은 공간까지) */
 function place(el,btn){if(!btn||el.style.display!='block'||el.classList.contains('full')){el.style.left=el.style.right=el.style.top=el.style.maxHeight='';return}
  const r=btn.getBoundingClientRect(),c=cv.getBoundingClientRect(),top=Math.max(8,r.bottom-c.top+8);
  if(innerWidth>640){el.style.left=clamp(r.left-c.left,8,Math.max(8,c.width-el.offsetWidth-8))+'px';el.style.right='auto'}else el.style.left=el.style.right='';
  el.style.top=top+'px';el.style.maxHeight=Math.max(120,c.height-top-12)+'px'}
-const wkBtn=()=>$(mode=='r'?'#bq':'#bw'),dlBtn=()=>$(dlKind=='save'?'#bs':dlKind=='share'?'#bk':dlKind=='auto'?'#bb':'#ba');
+const wkBtn=()=>$(mode=='r'?'#bq':'#bw'),dlBtn=()=>$(dlKind=='save'?'#bs':dlKind=='share'?'#bk':dlKind=='auto'?'#bb':dlKind=='theme'?'#bth':dlKind=='find'?'#bsr':'#ba');
 addEventListener('resize',()=>{place(wk,wkBtn());place(dl,dlBtn())});
 function wkShow(v){if(v)dlShow('');wk.style.display=v?'block':'none';$('#bw').classList.toggle('on',v);$('#bq').classList.toggle('on',v);if(v){renderWk();place(wk,wkBtn())}}
 const wkRef=()=>{if(wk.style.display=='block'&&!wk.contains(document.activeElement))renderWk()};
 $('#bw').onclick=$('#bq').onclick=()=>wkShow(wk.style.display!='block');
-wk.addEventListener('input',e=>{const d=e.target.dataset;if(d.we){const w=nd(d.we);if(!w)return;const en=Array.from({length:w.n||1},(_,k)=>(w.en&&w.en[k])||'');en[+d.i]=e.target.value.slice(0,100);w.en=en;sv();return}const w=nd(d.wt);if(!w)return;w.title=e.target.value.slice(0,100);sv()});
+wk.addEventListener('input',e=>{const d=e.target.dataset;if(d.wo!=null){const w=nd(d.wo);if(w){w.emo=[...e.target.value].slice(0,3).join('');sv()}return}if(d.we){const w=nd(d.we);if(!w)return;const en=Array.from({length:w.n||1},(_,k)=>(w.en&&w.en[k])||'');en[+d.i]=e.target.value.slice(0,100);w.en=en;sv();return}const w=nd(d.wt);if(!w)return;w.title=e.target.value.slice(0,100);sv()});
 wk.addEventListener('change',e=>{const d=e.target.dataset;
  if(d.ww!=null||d.wwp!=null){const on=e.target.checked;if(d.wwp!=null){const w=nd(d.wwp);if(w)tagIds(w).forEach(i=>on?WS.add(i):WS.delete(i))}else on?WS.add(d.ww):WS.delete(d.ww);wsSave();renderWk();drawLinks();return}
+ if(d.qs!=null){setPre(e.target.value);renderWk();return}
+ if(d.wi!=null){const w=nd(d.wi);if(w){w.imp=clamp(Math.round(+e.target.value)||0,0,2);sv();renderWk();if(sel)panel()}return}
+ if(d.wc!=null){const w=nd(d.wc),c=new Set(w&&w.cat||[]);if(w){e.target.checked?c.add(d.cc):c.delete(d.cc);w.cat=[...c];sv();renderWk()}return}
  const w=nd(d.wn);if(!w)return;const n=clamp(Math.round(+e.target.value)||1,1,500);w.n=n;if(w.en)w.en=w.en.slice(0,n);dropTags(i=>i.startsWith(w.id+'_')&&+i.slice(w.id.length+1)>n);sv();renderWk();if(sel)panel()});
-wk.addEventListener('click',e=>{const t=e.target,d=t.dataset;
+wk.addEventListener('click',e=>{const t=e.target.closest('[data-wwx],[data-wex],[data-ckx],[data-wa],[data-wd]')||e.target,d=t.dataset;/* 버튼 안의 글자(span)를 눌러도 버튼으로 처리 */
  if(d.wa=='x')return wkShow(false);
  if(d.wa=='all'||d.wa=='none'){WK().forEach(w=>tagIds(w).forEach(i=>d.wa=='all'?WS.add(i):WS.delete(i)));wsSave();renderWk();drawLinks();return}
  if(d.wwx){wwOpen.has(d.wwx)?wwOpen.delete(d.wwx):wwOpen.add(d.wwx);renderWk();return}
  if(d.wex){wxOpen.has(d.wex)?wxOpen.delete(d.wex):wxOpen.add(d.wex);renderWk();return}
+ if(d.ckx){ckOpen.has(d.ckx)?ckOpen.delete(d.ckx):ckOpen.add(d.ckx);renderWk();return}
+ if(d.wa=='q'||d.wa=='k'){const w={id:uid(),t:'w',x:0,y:0,title:d.wa=='q'?'새 프리셋':'새 카테고리',kind:d.wa,ord:Date.now()};if(d.wa=='k')w.pre=curP();S.nodes.push(w);if(d.wa=='q')setPre(w.id);else ckOpen.add(w.id);sv();renderWk();const i=wk.querySelector(`[data-wt="${w.id}"]`);if(i){i.focus();i.select()}return}
  if(d.wa){const w={id:uid(),t:'w',x:0,y:0,title:d.wa=='s'?'새 드라마':'새 영화',kind:d.wa,ord:Date.now()};if(d.wa=='s')w.n=1;S.nodes.push(w);sv();renderWk();const i=wk.querySelector(`[data-wt="${w.id}"]`);if(i){i.focus();i.select()}return}
  if(d.wd){if(!d.sure){t.dataset.sure=1;t.textContent='정말 삭제하시겠습니까?';setTimeout(()=>{t.dataset.sure='';t.textContent='삭제'},3000);return}
-  const w=nd(d.wd);if(!w)return;dropTags(i=>i==w.id||i.startsWith(w.id+'_'));S.nodes=S.nodes.filter(n=>n!=w);sv();renderWk();if(sel)panel()}});
+  const w=nd(d.wd);if(!w)return;
+  if(w.kind=='q'||w.kind=='k'){const ids=new Set([w.id,...(w.kind=='q'?CK(w.id).map(c=>c.id):[])]);S.nodes.forEach(n=>{if(n.cat&&n.cat.some(i=>ids.has(i)))n.cat=n.cat.filter(i=>!ids.has(i))});if(ids.has(curPre))setPre('');S.nodes=S.nodes.filter(n=>!ids.has(n.id))}
+  else{dropTags(i=>i==w.id||i.startsWith(w.id+'_'));S.nodes=S.nodes.filter(n=>n!=w)}
+  sv();renderWk();if(sel)panel()}});
 
 /* 입력 패널 */
-function panel(){CB.ge('p');if(mode=='e'&&msel.size>1){ins.style.display='block';ins.innerHTML=`<h3>${msel.size}개 선택됨</h3><label>끌면 함께 움직여요. 지우려면 Delete 키나 아래 버튼을 누르세요.</label><div class="row"><button data-a="delm" class="danger">모두 삭제</button></div>`;return}const o=obj(sel);if(!o){ins.style.display='none';return}if(mode!='e'){if(mode!='r'||o.t!='p'){ins.style.display='none';return}ins.style.display='block';ins.innerHTML=`<h3>${esc(o.name)||'이름 없음'}</h3>`+(o.desc?`<label style="white-space:pre-wrap">${esc(o.desc)}</label>`:'')+dxv(o)+tagText(o)+rel(o);return}
+let panId=null;
+function panel(){CB.ge('p');if(mode=='e'&&msel.size>1){ins.style.display='block';ins.innerHTML=`<h3>${msel.size}개 선택됨</h3><label>끌면 함께 움직여요. 지우려면 Delete 키나 아래 버튼을 누르세요.</label><div class="row"><button data-a="delm" class="danger">모두 삭제</button></div>`;return}const o=obj(sel);if(!o){ins.style.display='none';return}if(mode!='e'){ins.style.display='none';if(mode=='r'&&o.t=='p')pfOpen(o.id);return}
  ins.style.display='block';if(lk(sel)&&o.o==null)o.o=30;
  const T=(k,l)=>`<label>${l}<input type="text" data-k="${k}" value="${esc(o[k])}"></label>`,
  A=(k,l)=>`<label>${l}<textarea data-k="${k}">${esc(o[k])}</textarea></label>`,
  R=(k,l,a,b)=>`<label>${l}<input type="range" data-k="${k}" min="${a}" max="${b}" value="${esc(o[k])}"></label>`,
- C=(k,l)=>`<label>${l}<input type="color" data-k="${k}" value="${esc(o[k]||'#888888')}"></label>`,
+ RN=(k,l,a,b)=>`<label>${l}</label><div class="wr"><input type="range" data-k="${k}" min="${a}" max="${b}" value="${esc(o[k])}" aria-label="${l}" style="flex:1;width:auto;margin:0"><input type="number" data-k="${k}" min="1" step="1" value="${esc(o[k])}" aria-label="${l} 숫자" style="width:76px"></div>`,/* 슬라이더는 범위(a~b) 안에서만 움직이고, 숫자 칸은 그 밖의 값도 받음 */
+ C=(k,l)=>`<label>${l}<input type="color" data-k="${k}" value="${esc(dc(o[k]||'#888888'))}"></label>`,/* 다크 모드에선 선택칸이 화면에 칠해진 색을 보여 주고, 고른 색은 뒤집어 저장(아래 input 처리) */
  B=(k,l)=>`<label><input type="checkbox" data-k="${k}" ${o[k]?'checked':''}> ${l}</label>`;
  let h='';
- if(o.t=='p')h=`<h3>인물</h3>${T('name','이름')}${A('desc','설명')}<div class="row"><button data-a="img">이미지 첨부</button>${o.img?'<button data-a="rm">이미지 제거</button>':''}</div>${C('col','대표 색')}${B('pin','위치 고정')}${rel(o)}${tags(o)}${dxEdit(o)}<div class="row"><button data-a="conn"><svg class="ic" aria-hidden="true"><use href="#i-link"/></svg>선 연결</button></div>`;
- else if(o.t=='t')h=`<h3>텍스트</h3>${A('text','내용')}${R('size','크기',10,160)}${B('bold','굵게')}${C('col','색')}`;
- else if(o.t=='c')h=`<h3>원</h3>${T('title','제목')}${C('col','색')}${R('op','채움 농도',4,50)}<div class="row"><button data-a="img">배경 이미지 첨부</button>${o.img?'<button data-a="rm">배경 이미지 제거</button>':''}</div><label>인물을 원 안에 놓으면 멤버가 됩니다. 원을 끌면 멤버가 함께 움직이고, 크기는 모서리 점을 끌어 조절합니다.</label>${memList(o)}`;
+ if(o.t=='p')h=`<h3>인물</h3>${T('name','이름')}${A('desc','설명')}<div class="row"><button data-a="img">이미지 첨부</button>${o.img?'<button data-a="rm">이미지 제거</button>':''}</div>${C('col','대표 색')}<label>아이콘 크기</label><div class="row">${ISZ.map(([d,t])=>`<button data-is="${d}" aria-pressed="${2*ir(o)==d}" class="${2*ir(o)==d?'on':''}">${t}</button>`).join('')}</div>${B('pin','위치 고정')}${rel(o)}${tags(o)}${dxEdit(o)}${imEdit(o)}${stEdit(o)}<div class="row"><button data-a="conn"><svg class="ic" aria-hidden="true"><use href="#i-link"/></svg>선 연결</button></div>`;
+ else if(o.t=='t')h=`<h3>텍스트</h3>${A('text','내용')}${RN('size','크기',10,160)}${B('bold','굵게')}${C('col','색')}`;
+ else if(o.t=='c')h=`<h3>원</h3>${T('title','제목')}${C('col','색')}${R('op','채움 농도',4,50)}<div class="row"><button data-a="img">배경 이미지 첨부</button>${o.img?'<button data-a="rm">배경 이미지 제거</button>':''}</div><label>인물이나 더 작은 원을 원 안에 놓으면 멤버가 됩니다. 원을 끌면 멤버가 함께 움직이고, 크기는 모서리 점을 끌어 조절합니다.</label>${memList(o)}`;
  else h=`<h3>관계선</h3>${T('label','설명')}<label>방향<select data-k="dir">${[['to','→'],['from','←'],['both','↔'],['none','—']].map(([v,s])=>`<option value="${v}" ${(o.dir||'to')==v?'selected':''}>${esc(nd(o.a)?.name)} ${s} ${esc(nd(o.b)?.name)}</option>`).join('')}</select></label>${C('col','색')}${R('w','굵기',1,14)}${R('o','투명도',10,100)}${B('dash','점선')}${tags(o)}<div class="row"><button data-a="swap"><svg class="ic" aria-hidden="true"><use href="#i-swap"/></svg>방향 바꾸기</button><button data-a="dup"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>선 추가</button></div>`;
- ins.innerHTML=h+`<div class="row"><button class="danger" data-a="del">삭제</button></div>`;ins.querySelectorAll('[data-tgw]').forEach(x=>x.indeterminate=+x.dataset.c>0&&+x.dataset.c<+x.dataset.n)}
-ins.addEventListener('input',e=>{const t=e.target,k=t.dataset.k,D=t.dataset;if(D.dx!=null||D.dg!=null){const x=(obj(sel)?.dx||[])[+(D.dx??D.dg)];if(x){D.dx!=null?x.t=t.value.slice(0,5000):x.g=t.value;sv()}return}if(!k)return;const o=obj(sel);o[k]=t.type=='checkbox'?t.checked:t.type=='range'?+t.value:t.value;nd(sel)?upd(o):drawLinks();sv()});
+ const same=panId===sel,sc=ins.scrollTop,ds=ins.querySelector('.ddl')?.scrollTop||0;panId=sel;/* 같은 개체를 다시 그릴 땐 스크롤(패널·드롭다운 목록) 위치 유지 */
+ ins.innerHTML=h+`<div class="row"><button class="danger" data-a="del">삭제</button></div>`;ins.scrollTop=same?sc:0;{const dd=ins.querySelector('.ddl');if(dd)dd.scrollTop=same?ds:0}ins.querySelectorAll('[data-tgw]').forEach(x=>x.indeterminate=+x.dataset.c>0&&+x.dataset.c<+x.dataset.n)}
+ins.addEventListener('input',e=>{const t=e.target,k=t.dataset.k,D=t.dataset,o0=obj(sel);if(D.dx!=null||D.dg!=null){const x=(o0?.dx||[])[+(D.dx??D.dg)];if(x){D.dx!=null?x.t=t.value.slice(0,5000):x.g=t.value;sv()}return}
+ if(D.ig!=null){const x=(o0?.im||[])[+D.ig];if(x){x.g=t.value;upd(o0);sv()}return}
+ if(D.sd!=null){let d=SD();if(!d){d={id:uid(),t:'w',x:0,y:0,title:'',kind:'h',names:[...DEFN],ord:0};S.nodes.push(d)}const n=d.names.slice();n[+D.sd]=t.value.slice(0,6);d.names=n;sv();return}
+ if(D.sn!=null||D.sv!=null){const x=(o0?.st||[])[+(D.sn??D.sv)];if(x){if(D.sn!=null)x.n=t.value.slice(0,6);else{x.v=clamp(Math.round(+t.value)||0,0,10);t.nextElementSibling.textContent=x.v}$('#hxp').innerHTML=polySvg(o0);sv()}return}
+ if(!k)return;const o=obj(sel);
+ if(t.type=='number'){const v=+t.value;if(!(v>0))return;o[k]=Math.min(1e5,Math.round(v)||1);if(o[k]!=v)t.value=o[k]}/* 비었거나 0 이하면 무시, 상한 100000 */
+ else o[k]=t.type=='checkbox'?t.checked:t.type=='range'?+t.value:t.type=='color'?dc(t.value):t.value;
+ if(t.type=='number'||t.type=='range')ins.querySelectorAll(`[data-k="${k}"]`).forEach(x=>{if(x!==t)x.value=o[k]});/* 슬라이더와 숫자 칸을 서로 맞춤 */
+ nd(sel)?upd(o):drawLinks();sv()});
 ins.addEventListener('click',e=>{const a=e.target.dataset.a,o=obj(sel),gg=e.target.dataset.go;
- if(gg){select(gg);const n=nd(gg),r=cv.getBoundingClientRect(),v=S.view;v.x=r.width/2-(n.x+42)*v.k;v.y=r.height/2-(n.y+42)*v.k;applyView();return}
- const tx=e.target.dataset.tgx;if(tx){tgOpen.has(tx)?tgOpen.delete(tx):tgOpen.add(tx);panel();return}
+ if(gg){select(gg);const n=nd(gg),r=cv.getBoundingClientRect(),v=S.view;v.x=r.width/2-(n.x+ir(n))*v.k;v.y=r.height/2-(n.y+ir(n))*v.k;applyView();return}
+ if(e.target.closest('[data-tgd]')){tgDd=!tgDd;panel();if(tgDd)ins.querySelector('.ddl')?.scrollIntoView({block:'nearest'});return}
+ const tx=e.target.closest('[data-tgx]')?.dataset.tgx;if(tx){tgOpen.has(tx)?tgOpen.delete(tx):tgOpen.add(tx);panel();return}
+ const di=e.target.dataset.is;if(di&&mode=='e'&&o&&o.t=='p'&&ISZ.some(([d])=>d==di)){const r0=ir(o);+di==84?delete o.is:o.is=+di;o.x+=r0-ir(o);o.y+=r0-ir(o);upd(o);drawLinks();sv();panel();return}/* 아이콘 크기: 가운데는 그대로 두고 크기만 바뀜 */
  if(!a)return;
+ if(mode=='e'&&o&&a=='ima')return pickIm(o);
+ if(mode=='e'&&o&&(a=='imd'||a=='sta'||a=='std'||a=='sdo'||a=='sdr')){if(a=='imd'){o.im.splice(+e.target.dataset.i,1);upd(o)}else if(a=='sta')o.st=sNames().map(n=>({n,v:5}));else if(a=='sdo')sdOpen=!sdOpen;else if(a=='sdr')S.nodes=S.nodes.filter(n=>!(n.t=='w'&&n.kind=='h'));else delete o.st;sv();panel();return}
  if(mode=='e'&&o&&(a=='dxa'||a=='dxd')){if(a=='dxa')(o.dx=o.dx||[]).push({t:'',g:''});else o.dx.splice(+e.target.dataset.i,1);sv();panel();return}
  if(a=='delm'&&mode=='e')return del();if(a=='img')pickImg(o);if(a=='rm'){o.img='';upd(o);sv();panel()}if(a=='conn')startConn();if(a=='del')del();if(a=='dup')addLink(o.a,o.b);if(a=='swap'){[o.a,o.b]=[o.b,o.a];panel();drawLinks();sv()}});
+
+/* 읽기 모드 인물 프로필 모달(#pf): 인물을 짧게 눌렀을 때만(panel 의 읽기 분기에서 호출). 숨은 인물·관계·안 본 작품의 설명·사진은 거름 */
+const pf=$('#pf');let pfId=null,pfT=0;
+function pfOpen(id){pfId=id;pfT=Date.now();pf.hidden=false;cv.inert=true;pfRender();pf.querySelector('[data-pf=x]').focus()}
+function pfClose(){if(pfId==null)return;pfId=null;pf.hidden=true;cv.inert=false;if(mode=='r')select(null)}
+function pfRender(){const o=nd(pfId);if(!o||o.t!='p'||HID.has(o.id))return pfClose();
+ const cols=pf.querySelector('.pf-cols'),sc=[...cols.children].map(x=>x.scrollTop),av=(p,c)=>{const q=pimg(p);return`<span class="${c}" style="background:${esc(dc(p.col))}">${q?`<img src="${esc(q)}" alt="">`:esc((p.name||'?').trim().charAt(0))}</span>`},
+ R=S.links.filter(l=>(l.a==o.id||l.b==o.id)&&!HID.has(l.id)).map(l=>{const x=nd(l.a==o.id?l.b:l.a);return x?`<button class="go" data-go="${esc(x.id)}">${av(x,'pm')}<span class="gt"><b>${esc(x.name)||'이름 없음'}</b><i>${esc(l.label||'연결')}</i></span></button>`:''}).join(''),
+ G=S.nodes.filter(c=>c.t=='c'&&c.m&&c.m.includes(o.id)&&!HID.has(c.id)).map(c=>`<div class="gr"><span class="pd" style="background:${esc(dc(c.col))}"></span><span class="gt"><b>${esc(c.title)||'그룹'}</b><i>인물 ${c.m.filter(i=>nd(i)&&nd(i).t=='p'&&!HID.has(i)).length}명</i></span></div>`).join('');
+ cols.innerHTML=`<section class="pf-l">${av(o,'pf-av')}<h2 class="pf-n">${esc(o.name)||'이름 없음'}</h2>${stSel(o)}`+(o.desc?`<p class="pf-d">${esc(o.desc)}</p>`:'')+dxv(o)+tagText(o)+(o.st?polySvg(o):'')+`</section><section class="pf-r"><div class="pf-s">연결된 인물</div>${R||'<div class="pf-e">연결된 인물이 없어요.</div>'}<div class="pf-s">소속 그룹</div>${G||'<div class="pf-e">소속된 그룹이 없어요.</div>'}</section>`;
+ [...cols.children].forEach((x,i)=>x.scrollTop=sc[i]||0)}
+pf.addEventListener('change',e=>{const t=e.target;if(t.dataset.ps==null||pfId==null)return;if(t.value)PS[pfId]=t.value;else delete PS[pfId];psSave();drawLinks();pfRender();pf.querySelector('[data-ps]')?.focus()});
+pf.addEventListener('click',e=>{const t=e.target,g=t.closest('[data-go]');
+ if(t.closest('[data-pf=x]')||t.classList.contains('pf-scrim')&&Date.now()-pfT>350)return pfClose();/* 터치 뒤따라오는 클릭이 바로 닫지 않게 */
+ if(g&&nd(g.dataset.go)&&!HID.has(g.dataset.go)){pfId=g.dataset.go;pfRender();pf.querySelectorAll('.pf-l,.pf-r').forEach(x=>x.scrollTop=0)}});
 
 /* 포인터 */
 /* 사각형 범위 선택: 인물·글자는 조금이라도 걸치면, 그룹 원은 통째로 들어와야 선택 (선은 양 끝 인물이 따라가므로 선택 대상이 아님) */
 function boxEnd(e){const bx=$('#sbox');bx.style.display='none';if(!drag.moved)return;
  const r=cv.getBoundingClientRect(),v=S.view,X=c=>(c-r.left-v.x)/v.k,Y=c=>(c-r.top-v.y)/v.k,x0=X(Math.min(drag.sx,e.clientX)),x1=X(Math.max(drag.sx,e.clientX)),y0=Y(Math.min(drag.sy,e.clientY)),y1=Y(Math.max(drag.sy,e.clientY)),ids=[];
  S.nodes.forEach(n=>{if(n.t=='w'||!els[n.id])return;const[w,h]=sz(n);
-  if(n.t=='c'?n.x>=x0&&n.y>=y0&&n.x+w<=x1&&n.y+h<=y1:n.x<x1&&n.x+w>x0&&n.y<y1&&n.y+h>y0)ids.push(n.id)});
+  if(n.t=='c'?n.x>=x0&&n.y>=y0&&n.x+w<=x1&&n.y+h<=y1:n.t=='p'?(()=>{const r=ir(n),cx=n.x+r,cy=n.y+r,dx=Math.max(x0-cx,0,cx-x1),dy=Math.max(y0-cy,0,cy-y1);return dx*dx+dy*dy<r*r})()/* 인물은 아이콘 원(반지름 ir)에 닿을 때만 */:n.x<x1&&n.x+w>x0&&n.y<y1&&n.y+h>y0)ids.push(n.id)});
  if(ids.length==1)return select(ids[0]);if(!ids.length)return;
  msel=new Set(ids);ids.forEach(i=>els[i].classList.add('ms'));panel()}
-const panAt=e=>({m:'pan',vx:S.view.x,vy:S.view.y,sx:e.clientX,sy:e.clientY});
-const inside=(c,p)=>{const x=p.x+42-(c.x+c.w/2),y=p.y+42-(c.y+c.h/2);return(x/(c.w/2))**2+(y/(c.h/2))**2<=1};
+const panAt=e=>(fly++,{m:'pan',vx:S.view.x,vy:S.view.y,sx:e.clientX,sy:e.clientY});
+const inside=(c,p)=>{const x=p.x+ir(p)-(c.x+c.w/2),y=p.y+ir(p)-(c.y+c.h/2);return(x/(c.w/2))**2+(y/(c.h/2))**2<=1};
 cv.addEventListener('pointerdown',e=>{if(e.target.closest('#tb,#ins,#wk,#dl'))return;
  if(e.button==2){drag=panAt(e);return}/* 우클릭 드래그: 선택 없이 화면 이동 */
  if(e.button>0)return;
@@ -363,10 +532,10 @@ cv.addEventListener('pointerdown',e=>{if(e.target.closest('#tb,#ins,#wk,#dl'))re
  if(mode=='r'&&n&&n.t=='p'&&!n.pin){drag={m:'el',n,tap:id,sx:e.clientX,sy:e.clientY,D:[0,0]};ract=1;return}/* 읽기: 인물을 잡아당기면 화면에서만 탄성 있게 움직임 */
  if(mode!='e'){drag={...panAt(e),tap:mode=='r'&&n&&n.t=='p'?id:null};if(!drag.tap)select(null);return}/* 읽기·이동: 끌면 화면 이동, 읽기에선 인물을 짧게 누를 때만 프로필 */
  if(connMode){if(n&&n.t=='p'){if(!conn){conn=id;els[id].classList.add('sel2');return}if(conn!=id){const a=conn;endConn();addLink(a,id);return}}else endConn();return}
- if(e.target.classList.contains('rz'))drag={m:'rz',n,w:n.w,h:n.h};
+ if(e.target.classList.contains('rz'))drag={m:'rz',n,w:n.w,h:n.h,cx:n.x+n.w/2,cy:n.y+n.h/2,kids:gKids(n).filter(p=>p.t=='p'||p.t=='c').map(p=>[p,p.x,p.y,p.w,p.h])};
  else if(n&&msel.size>1&&msel.has(id)){const all=[...msel].map(nd).filter(Boolean),seen=new Set([id]),kids=[];/* 선택한 것들(과 선택한 그룹의 멤버)을 함께 끌기 */
-  all.forEach(a=>{if(!seen.has(a.id)){seen.add(a.id);kids.push([a,a.x,a.y])}if(a.t=='c')a.m.map(nd).filter(Boolean).forEach(p=>{if(!seen.has(p.id)){seen.add(p.id);kids.push([p,p.x,p.y])}})});drag={m:'mv',n,ms:all,cyc:null,ox:n.x,oy:n.y,kids}}
- else if(n){const stk=[...new Set(document.elementsFromPoint(e.clientX,e.clientY).map(x=>x.closest('[data-id]')?.dataset.id).filter(i=>i&&nd(i)))],was=sel===id;select(id,true);drag={m:'mv',n,cyc:was&&stk.length>1?stk:null,ox:n.x,oy:n.y,kids:n.t=='c'?n.m.map(nd).filter(Boolean).map(p=>[p,p.x,p.y]):[]}}
+  all.forEach(a=>{if(!seen.has(a.id)){seen.add(a.id);kids.push([a,a.x,a.y])}if(a.t=='c')gKids(a).forEach(p=>{if(!seen.has(p.id)){seen.add(p.id);kids.push([p,p.x,p.y])}})});drag={m:'mv',n,ms:all,cyc:null,ox:n.x,oy:n.y,kids}}
+ else if(n){const stk=[...new Set(document.elementsFromPoint(e.clientX,e.clientY).map(x=>x.closest('[data-id]')?.dataset.id).filter(i=>i&&nd(i)))],was=sel===id;select(id,true);drag={m:'mv',n,cyc:was&&stk.length>1?stk:null,ox:n.x,oy:n.y,kids:n.t=='c'?gKids(n).map(p=>[p,p.x,p.y]):[]}}
  else if(id){select(id);return}
  else{select(null);drag={m:'box'}}/* 편집: 빈 곳을 끌면 사각형 범위 다중 선택(화면 이동은 우클릭 드래그·이동 모드) */
  drag.sx=e.clientX;drag.sy=e.clientY});
@@ -374,17 +543,19 @@ window.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-dra
  if(drag.m=='pan'){S.view.x=drag.vx+dx;S.view.y=drag.vy+dy;applyView()}
  else if(drag.m=='box'){if(drag.moved){const b=$('#sbox').style;b.display='block';b.left=Math.min(drag.sx,e.clientX)+'px';b.top=Math.min(drag.sy,e.clientY)+'px';b.width=Math.abs(dx)+'px';b.height=Math.abs(dy)+'px'}}
  else if(drag.m=='el')drag.D=[dx/k,dy/k];
- else if(drag.m=='rz'){n.w=Math.max(120,drag.w+dx/k*1.17);n.h=Math.max(120,drag.h+dy/k*1.17);upd(n);n.base=Math.max(n.w,n.h)/2}
- else{n.x=drag.ox+dx/k;n.y=drag.oy+dy/k;upd(n);drag.kids.forEach(([p,x,y])=>{p.x=x+dx/k;p.y=y+dy/k;upd(p)});if(n.t=='p')S.nodes.forEach(c=>{if(c.t=='c')els[c.id].classList.toggle('hot',inside(c,n))});heat(.25);drawLinks()}});
-window.addEventListener('pointerup',e=>{if(drag&&drag.m=='box'){boxEnd(e);drag=null;return}if(drag&&drag.tap&&!drag.moved){const i=drag.tap;drag=null;select(i);return}if(drag&&drag.m=='el'){drag=null;return}if(drag&&drag.m!='pan'){const n=drag.n;if(drag.m=='mv')(drag.ms||[n]).forEach(p=>{if(p.t=='p')joinGroups(p)});if(drag.m=='rz')S.nodes.filter(p=>p.t=='p').forEach(joinGroups);sv();heat(.4);const c=drag.cyc;if(c&&!drag.moved&&drag.m=='mv'){drag=null;select(c[(c.indexOf(sel)+1)%c.length]);return}if(!drag.moved&&drag.m=='mv')panel()}drag=null});
-window.addEventListener('pointercancel',()=>{$('#sbox').style.display='none';if(drag&&drag.m!='pan'&&drag.m!='el'&&drag.m!='box'){const n=drag.n;if(drag.m=='mv'&&n.t=='p')joinGroups(n);if(drag.m=='rz')S.nodes.filter(p=>p.t=='p').forEach(joinGroups);sv();heat(.4)}drag=null});
+ else if(drag.m=='rz'){const sq=e.ctrlKey||e.metaKey,s=Math.max(120,(drag.w+drag.h)/2+(dx+dy)/2/k*1.17);/* Ctrl(맥은 Cmd)을 누르고 조절하면 정원: 처음 가로·세로의 평균에서 대각선으로 늘고 줄임 */n.w=sq?s:Math.max(120,drag.w+dx/k*1.17);n.h=sq?s:Math.max(120,drag.h+dy/k*1.17);upd(n);n.base=Math.max(n.w,n.h)/2;
+  /* 원 크기를 바꾸면 안의 인물·작은 원도 같은 비율로 위치(작은 원은 크기도)가 따라가서, 줄일 때 밖으로 밀려나지 않음 */
+  const sx=n.w/drag.w,sy=n.h/drag.h,X=n.x+n.w/2,Y=n.y+n.h/2;drag.kids.forEach(([p,x,y,w,h])=>{const c=p.t=='c',r=c?0:ir(p),hw=c?w/2:r,hh=c?h/2:r;p.x=X+(x+hw-drag.cx)*sx-(c?w*sx/2:r);p.y=Y+(y+hh-drag.cy)*sy-(c?h*sy/2:r);if(c){p.w=w*sx;p.h=h*sy;p.base=Math.max(p.w,p.h)/2}upd(p)})}
+ else{n.x=drag.ox+dx/k;n.y=drag.oy+dy/k;upd(n);drag.kids.forEach(([p,x,y])=>{p.x=x+dx/k;p.y=y+dy/k;upd(p)});if(n.t=='p')S.nodes.forEach(c=>{if(c.t=='c')els[c.id].classList.toggle('hot',inside(c,n))});if(n.t=='c')S.nodes.forEach(c=>{if(c.t=='c'&&c!=n)els[c.id].classList.toggle('hot',gIn(c,n))});heat(.25);drawLinks()}});
+window.addEventListener('pointerup',e=>{if(drag&&drag.m=='box'){boxEnd(e);drag=null;return}if(drag&&drag.tap&&!drag.moved){const i=drag.tap;drag=null;select(i);return}if(drag&&drag.m=='el'){drag=null;return}if(drag&&drag.m!='pan'){const n=drag.n;if(drag.m=='mv')(drag.ms||[n]).forEach(p=>{if(p.t=='p')joinGroups(p);else if(p.t=='c')joinG(p)});if(drag.m=='rz'){S.nodes.filter(p=>p.t=='p').forEach(joinGroups);joinG(n);ordG()}sv();heat(.4);const c=drag.cyc;if(c&&!drag.moved&&drag.m=='mv'){drag=null;select(c[(c.indexOf(sel)+1)%c.length]);return}if(!drag.moved&&drag.m=='mv')panel()}drag=null});
+window.addEventListener('pointercancel',()=>{$('#sbox').style.display='none';if(drag&&drag.m!='pan'&&drag.m!='el'&&drag.m!='box'){const n=drag.n;if(drag.m=='mv'&&n.t=='p')joinGroups(n);if(drag.m=='mv'&&n.t=='c')joinG(n);if(drag.m=='rz'){S.nodes.filter(p=>p.t=='p').forEach(joinGroups);joinG(n);ordG()}sv();heat(.4)}drag=null});
 cv.addEventListener('contextmenu',e=>{if(!e.target.closest('#tb,#ins,#wk,#dl'))e.preventDefault()});
 cv.addEventListener('dblclick',e=>{if(mode!='e'||e.target.closest('#tb,#ins,#wk,#dl'))return;const id=e.target.closest('[data-id]')?.dataset.id,n=nd(id);
  if(n&&n.t=='p'&&e.target.classList.contains('im'))return pickImg(n);
  if(id){const f=ins.querySelector('input[type=text],textarea');f&&f.focus();f&&f.select()}});
-cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*(e.ctrlKey?.01:.0015)))},{passive:false});
+cv.addEventListener('wheel',e=>{const m=e.target.closest('#tb,#ins,#wk,#dl');if(m){if(m.id=='tb')m.scrollLeft+=e.deltaX||e.deltaY;return}/* 창 위에선 확대하지 않고 창이 스크롤되게 */e.preventDefault();zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*(e.ctrlKey?.01:.0015)))},{passive:false});
 window.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;
- if(mode=='e'&&(e.key=='Delete'||e.key=='Backspace')&&(sel||msel.size>1)){e.preventDefault();del()}if(e.key=='Escape'){endConn();select(null)}});
+ if(mode=='e'&&(e.key=='Delete'||e.key=='Backspace')&&(sel||msel.size>1)){e.preventDefault();del()}if(e.key=='Escape'){if(pfId!=null)return pfClose();endConn();select(null)}});
 
 /* 툴바 */
 document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>addNode(b.dataset.t));
@@ -396,7 +567,7 @@ let rt=0;$('#br').onclick=()=>{const b=$('#br');if(!rt){b.textContent='정말 �
  clearTimeout(rt);rt=0;b.textContent='초기화';b.classList.remove('danger');bkSnap(true);S={view:S.view,ph:S.ph,nodes:[],links:[]};clearDom();select(null);sv()};
 
 /* 모드: r=읽기(기본, 보기만) / e=편집 / m=이동(편집 화면 그대로, 요소는 못 만지고 화면 이동·확대만) */
-function setMode(m){if(S.lock&&!room&&m!='r')m='r';if(m==mode)return;const was=mode;mode=m;endConn();drag=null;$('#sbox').style.display='none';if(msel.size)select(null);
+function setMode(m){if(S.lock&&!room&&m!='r')m='r';if(m==mode)return;const was=mode;mode=m;endConn();drag=null;pfClose();$('#sbox').style.display='none';if(msel.size)select(null);
  if(was=='e'&&(alpha||man)){alpha=0;man=0;sv();CB.ge('r')}
  cv.dataset.mode=m;document.querySelectorAll('.ed').forEach(x=>x.inert=m!='e');
  rreset();wkShow(false);if(hov)setHov(null);select(null);
@@ -424,7 +595,7 @@ function rtick(){const dr=drag&&drag.m=='el'?drag:null;if(!ract&&!dr)return;
  /* 그룹 원: 멤버들이 움직인 평균만큼 중심이 따라가고, 가장 먼 멤버까지의 거리가 늘고 줄어든 만큼 크기가 커지고 줄어듦(저장된 원은 그대로, 화면에서만) */
  S.nodes.forEach(c=>{if(c.t!='c'||!c.m)return;const M=c.m.map(nd).filter(p=>p&&p.t=='p'&&!HID.has(p.id));if(!M.length)return;
   const cx=c.x+c.w/2,cy=c.y+c.h/2;let sx=0,sy=0,d0=0,d1=0;M.forEach(p=>{sx+=p._dx||0;sy+=p._dy||0});sx/=M.length;sy/=M.length;
-  M.forEach(p=>{const hx=p.x+42-cx,hy=p.y+42-cy;d0=Math.max(d0,Math.hypot(hx,hy));d1=Math.max(d1,Math.hypot(hx+(p._dx||0)-sx,hy+(p._dy||0)-sy))});
+  M.forEach(p=>{const hx=p.x+ir(p)-cx,hy=p.y+ir(p)-cy;d0=Math.max(d0,Math.hypot(hx,hy));d1=Math.max(d1,Math.hypot(hx+(p._dx||0)-sx,hy+(p._dy||0)-sy))});
   const g=c._g2||(c._g2=[0,0,0]),t=[sx,sy,Math.max(d1-d0,-.1*Math.min(c.w,c.h))];let busy=false;
   for(let i=0;i<3;i++){g[i]+=(t[i]-g[i])*.3;if(Math.abs(t[i]-g[i])>.05)busy=true}
   if(busy)mv=true;else for(let i=0;i<3;i++)g[i]=t[i];
@@ -436,12 +607,18 @@ let man=0;const PH=()=>S.ph!==false,heat=()=>{}/* shortcut: 편집 모드 물리
 function phb(){const b=$('#bp');b.querySelector('.bt').textContent=PH()?'물리 ON':'물리 OFF';b.classList.toggle('on',PH())}
 $('#bp').onclick=()=>{S.ph=!PH();phb();if(PH())heat(1);sv()};$('#bh').onclick=relax;
 function migrate(){S.nodes.forEach(c=>{if(c.t=='c'&&c.ph===undefined)c.ph=true;if(c.t=='c'&&!c.m)c.m=S.nodes.filter(p=>p.t=='p'&&inside(c,p)).map(p=>p.id)})}
+/* 그룹 안의 그룹: 더 작은 원의 네 끝점이 모두 들어오면 멤버(면적 순서로만 포함해서 서로 포함하는 일이 없음). 큰 원부터 아래에 깔리게 DOM 순서도 맞춤 */
+/* 그룹을 끌 때 함께 움직일 것: 멤버와, 멤버인 작은 그룹의 멤버까지 안쪽으로 계속(중복 없이) */
+const gKids=(g,seen=new Set([g.id]))=>g.m.map(nd).filter(Boolean).flatMap(p=>seen.has(p.id)?[]:(seen.add(p.id),[p,...(p.t=='c'?gKids(p,seen):[])]));
+const gIn=(c,g)=>g.w*g.h<c.w*c.h&&[[g.w/2,0],[-g.w/2,0],[0,g.h/2],[0,-g.h/2]].every(([dx,dy])=>{const x=g.x+g.w/2+dx-(c.x+c.w/2),y=g.y+g.h/2+dy-(c.y+c.h/2);return(x/(c.w/2))**2+(y/(c.h/2))**2<=1});
+function joinG(g){g.m=g.m||[];S.nodes.forEach(c=>{if(c.t=='c')els[c.id].classList.remove('hot');if(c.t!='c'||c==g)return;c.m=c.m||[];for(const[a,b]of[[c,g],[g,c]]){const i=a.m.indexOf(b.id),on=gIn(a,b);if(on&&i<0)a.m.push(b.id);if(!on&&i>=0)a.m.splice(i,1)}})}
+const ordG=()=>S.nodes.filter(n=>n.t=='c'&&els[n.id]).sort((a,b)=>b.w*b.h-a.w*a.h).forEach(c=>W.appendChild(els[c.id]));
 function joinGroups(p){S.nodes.forEach(c=>{if(c.t!='c')return;const i=c.m.indexOf(p.id),ins=inside(c,p);if(ins&&i<0)c.m.push(p.id);if(!ins&&i>=0)c.m.splice(i,1);els[c.id].classList.remove('hot')})}
 function setHov(id){hov=id;const nb=new Set([id]);S.links.forEach(l=>{if(l.a==id)nb.add(l.b);if(l.b==id)nb.add(l.a)});
  S.nodes.forEach(n=>{if(n.t=='p')els[n.id].classList.toggle('dim',!!id&&!nb.has(n.id))});drawLinks()}
 cv.addEventListener('pointerover',e=>{if(drag||mode=='m')return;const id=e.target.closest('.p')?.dataset.id||null;if(id!==hov)setHov(id)});
 function tick(){requestAnimationFrame(tick);if(mode=='r')return rtick();if((!PH()&&!man)||alpha<.02){if(alpha){alpha=0;man=0;sv();CB.ge('r')}return}
- const P=S.nodes.filter(n=>n.t=='p'),C=S.nodes.filter(n=>n.t=='c'&&n.m&&n.m.length&&n.ph!==false),X=n=>n.x+42,Y=n=>n.y+42;
+ const P=S.nodes.filter(n=>n.t=='p'),C=S.nodes.filter(n=>n.t=='c'&&n.m&&n.m.length&&n.ph!==false),X=n=>n.x+ir(n),Y=n=>n.y+ir(n);
  let mx=0,my=0;P.forEach(p=>{p.fx=p.fy=0;p.vx=p.vx||0;p.vy=p.vy||0;mx+=X(p);my+=Y(p)});mx/=P.length||1;my/=P.length||1;
  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j];let dx=X(b)-X(a),dy=Y(b)-Y(a),d=Math.hypot(dx,dy);
   if(d<1){dx=Math.random()-.5;dy=Math.random()-.5;d=1}
@@ -481,8 +658,9 @@ cv.addEventListener('pointerdown',e=>{ptr.set(e.pointerId,[e.clientX,e.clientY])
 window.addEventListener('pointermove',e=>{if(!ptr.has(e.pointerId))return;ptr.set(e.pointerId,[e.clientX,e.clientY]);if(ptr.size==2&&pin2){const[a,b]=[...ptr.values()],d=pd();zoomAt((a[0]+b[0])/2,(a[1]+b[1])/2,d/pin2);pin2=d}});
 const pu=e=>{ptr.delete(e.pointerId);if(ptr.size<2)pin2=0};window.addEventListener('pointerup',pu);window.addEventListener('pointercancel',pu);
 function rel(o){const r=S.links.filter(l=>(l.a==o.id||l.b==o.id)&&!HID.has(l.id)).map(l=>{const x=nd(l.a==o.id?l.b:l.a);return x?`<button class="go" data-go="${esc(x.id)}">${esc(x.name)} · ${esc(l.label||'연결')}</button>`:''}).join('');return r?`<label>연결된 인물</label>${r}`:''}
-function memList(c){return '<label>멤버</label>'+S.nodes.filter(p=>p.t=='p').map(p=>`<label style="display:flex;gap:6px;align-items:center;margin:0 0 4px"><input type="checkbox" data-mem="${esc(p.id)}" ${c.m.includes(p.id)?'checked':''}>${esc(p.name)}</label>`).join('')}
-ins.addEventListener('change',e=>{const tg=e.target.dataset.tg,tw=e.target.dataset.tgw;if(tg!=null||tw!=null){setTag(tg,tw,e.target.checked);return}const id=e.target.dataset.mem;if(!id)return;const c=obj(sel),i=c.m.indexOf(id);if(e.target.checked){if(i<0)c.m.push(id)}else if(i>=0)c.m.splice(i,1);sv();heat(.6)});
+function memList(c){return '<label>멤버</label>'+S.nodes.filter(p=>p.t=='p'||p.t=='c'&&p!=c&&p.w*p.h<c.w*c.h).map(p=>`<label style="display:flex;gap:6px;align-items:center;margin:0 0 4px"><input type="checkbox" data-mem="${esc(p.id)}" ${c.m.includes(p.id)?'checked':''}>${p.t=='c'?'그룹 · '+esc(p.title||'그룹'):esc(p.name)}</label>`).join('')}
+ins.addEventListener('change',e=>{const dd=e.target.dataset;if(dd.nn!=null||dd.sdn!=null){const n=Math.round(+e.target.value),o=obj(sel);/* 항목 수: 범위 밖이면 3~12 로 맞추고, 비었거나 3 미만이면 무시 */if(n>=NMIN){const m=Math.min(NMAX,n);if(dd.nn!=null){if(o&&o.st)stResize(o,m)}else sdResize(m)}panel();return}
+ const tg=e.target.dataset.tg,tw=e.target.dataset.tgw;if(tg!=null||tw!=null){setTag(tg,tw,e.target.checked);return}const id=e.target.dataset.mem;if(!id)return;const c=obj(sel),i=c.m.indexOf(id);if(e.target.checked){if(i<0)c.m.push(id)}else if(i>=0)c.m.splice(i,1);sv();heat(.6)});
 function fromA(a){const C={blue:'#0066ff',violet:'#6541f2',cyan:'#007c90',green:'#00822b',orange:'#b85a00',red:'#d92b2b'},N=[],P=a.nodes||[];
  P.forEach(n=>N.push({id:n.id,t:'p',x:n.x-42,y:n.y-42,name:n.name||'',desc:n.desc||'',img:n.img||'',col:pc()}));
  (a.texts||[]).forEach(t=>N.push({id:t.id,t:'t',x:t.x,y:t.y,text:t.text||'',size:t.size||20,bold:false,col:C[t.color]||''}));
@@ -499,11 +677,18 @@ const TG=a=>[...new Set(a.filter(idOk))].slice(0,300),nm=(v,d,a,b)=>{v=+v;return
 function cleanEnt(k,d){if(!d||typeof d!='object'||Array.isArray(d))return null;const r={};
  if(k=='l'){if(!idOk(d.a)||!idOk(d.b))return null;r.a=d.a;r.b=d.b;r.label=tx(d.label,300);r.col=HEX.test(d.col)?d.col:'#70737C';r.w=nm(d.w,5,1,14);r.o=nm(d.o,30,10,100);
   if(['to','from','both','none'].includes(d.dir))r.dir=d.dir;if(typeof d.dash=='boolean')r.dash=d.dash;if(Array.isArray(d.tg))r.tg=TG(d.tg);return r}
- const t=d.t;if(t!='p'&&t!='t'&&t!='c'&&t!='w')return null;r.t=t;const im=typeof d.img=='string'&&IMG.test(d.img)&&d.img.length<=1500000?d.img:'';r.x=nm(d.x,0,-1e6,1e6);r.y=nm(d.y,0,-1e6,1e6);
+ const t=d.t;if(t!='p'&&t!='t'&&t!='c'&&t!='w')return null;r.t=t;const im=imgOk(d.img)?d.img:'';r.x=nm(d.x,0,-1e6,1e6);r.y=nm(d.y,0,-1e6,1e6);
  if(t=='p'){r.name=tx(d.name,200);r.desc=tx(d.desc,5000);r.img=im;r.col=HEX.test(d.col)?d.col:'#0066FF';if(typeof d.pin=='boolean')r.pin=d.pin;if(Array.isArray(d.tg))r.tg=TG(d.tg);
-  if(Array.isArray(d.dx))r.dx=d.dx.slice(0,30).map(x=>({t:tx(x&&x.t,5000),g:idOk(x&&x.g)?x.g:''}))}/* dx = 시청에 따라 보이는 추가 설명: g 작품·에피소드를 봤을 때만 보임('' 이면 항상) */
- else if(t=='w'){r.title=tx(d.title,100);r.kind=d.kind=='s'?'s':'m';if(r.kind=='s'){r.n=Math.round(nm(d.n,1,1,500));if(Array.isArray(d.en))r.en=d.en.slice(0,r.n).map(x=>tx(x,100))}r.ord=nm(d.ord,0,0,1e15)}
- else if(t=='t'){r.text=tx(d.text,5000);r.size=nm(d.size,22,6,400);r.bold=!!d.bold;r.col=d.col===''||HEX.test(d.col)?d.col:''}
+  {const is=Math.round(nm(d.is,84,24,400));if(is!=84)r.is=is}/* 아이콘 지름: 기본 84 면 저장 안 함 */
+  if(Array.isArray(d.dx))r.dx=d.dx.slice(0,30).map(x=>({t:tx(x&&x.t,5000),g:idOk(x&&x.g)?x.g:''}));
+  if(Array.isArray(d.im))r.im=d.im.slice(0,12).map(x=>({img:x&&imgOk(x.img)?x.img:'',g:idOk(x&&x.g)?x.g:''}));
+  if(Array.isArray(d.st)&&d.st.length>=NMIN&&d.st.length<=NMAX)r.st=d.st.map(x=>({n:tx(x&&x.n,6),v:Math.round(nm(x&&x.v,0,0,10))}))}/* dx = 시청에 따라 보이는 추가 설명: g 작품·에피소드를 봤을 때만 보임('' 이면 항상) */
+ else if(t=='w'){r.title=tx(d.title,100);r.kind=d.kind=='s'||d.kind=='q'||d.kind=='k'||d.kind=='h'?d.kind:'m';if(r.kind=='s'){r.n=Math.round(nm(d.n,1,1,500));if(Array.isArray(d.en))r.en=d.en.slice(0,r.n).map(x=>tx(x,100))}
+  if(r.kind=='k')r.pre=idOk(d.pre)?d.pre:'';
+  else if(r.kind=='h')r.names=Array.isArray(d.names)&&d.names.length>=NMIN&&d.names.length<=NMAX?d.names.map(x=>tx(x,6)):[...DEFN];
+  else if(r.kind!='q'){const im=Math.round(nm(d.imp,0,0,2)),em=[...tx(d.emo,40)].slice(0,3).join(''),ct=Array.isArray(d.cat)?TG(d.cat).slice(0,30):[];if(im)r.imp=im;if(em)r.emo=em;if(ct.length)r.cat=ct}
+  r.ord=nm(d.ord,0,0,1e15)}/* 작품 선택 필드 imp·emo·cat 은 기본값이면 저장하지 않음 */
+ else if(t=='t'){r.text=tx(d.text,5000);r.size=nm(d.size,22,1,1e5);r.bold=!!d.bold;r.col=d.col===''||HEX.test(d.col)?d.col:''}
  else{r.w=nm(d.w,420,40,20000);r.h=nm(d.h,420,40,20000);r.title=tx(d.title,200);r.col=HEX.test(d.col)?d.col:'#0066FF';r.op=nm(d.op,8,0,100);
   if(im)r.img=im;if(Array.isArray(d.m))r.m=d.m.filter(idOk).slice(0,2000);if(typeof d.ph=='boolean')r.ph=d.ph}
  return r}
@@ -515,8 +700,11 @@ function cleanDoc(d){if(!d||!Array.isArray(d.nodes)||!Array.isArray(d.links)||d.
  const lu=new Set();for(const l of d.links){if(!l||typeof l!='object')continue;const c=cleanEnt('l',{...l,a:map.get(l.a)||l.a,b:map.get(l.b)||l.b});if(!c||!used.has(c.a)||!used.has(c.b))continue;let id=l.id;if(!idOk(id)||lu.has(id)){id=uid();while(lu.has(id))id=uid()}lu.add(id);links.push({...c,id})}
  return{ph:typeof d.ph=='boolean'?d.ph:undefined,nodes,links}}
 /* JSON 저장: 지금 화면의 관계도(보기 위치·물리 계산용 임시값은 제외)를 파일로 내려받음. 공동 편집 중에도 동작 */
-function dlFile(kind){kind=kind||'backup';const b=$('#bs');try{
- const txt=JSON.stringify({app:'relmap',version:1,kind,exportedAt:new Date().toISOString(),ph:S.ph,nodes:S.nodes,links:S.links},strip,1);
+/* 파일로 저장할 땐 사진 서버 주소를 사진 자체(data URL)로 바꿔 넣음 — 파일 하나로 완결(서버를 옮기거나 지워도 사진이 남음). 못 받은 사진은 주소 그대로 */
+async function inl(nodes){if(!PHRE)return nodes;const m=new Map(),dat=u=>PHRE.test(u)?(m.get(u)||m.set(u,fetch(u).then(r=>r.ok?r.blob():Promise.reject()).then(b=>new Promise(ok=>{const f=new FileReader();f.onload=()=>ok(f.result);f.readAsDataURL(b)})).catch(()=>u)).get(u)):u;
+ return Promise.all(nodes.map(async o=>o.img||o.im?{...o,img:o.img&&await dat(o.img),...(o.im?{im:await Promise.all(o.im.map(async x=>({...x,img:x.img&&await dat(x.img)})))}:{})}:o))}
+async function dlFile(kind){kind=kind||'backup';const b=$('#bs');try{
+ const txt=JSON.stringify({app:'relmap',version:1,kind,exportedAt:new Date().toISOString(),ph:S.ph,nodes:await inl(S.nodes),links:S.links},strip,1);
  const url=URL.createObjectURL(new Blob([txt],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='인물관계도_'+(kind=='share'?'감상용_':'')+new Date().toLocaleDateString('sv-SE')+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);flash(b,'저장 완료')}
  catch(e){console.error(e);flash(b,'저장 실패')}}
 /* JSON 불러오기: 공동 편집 중이면 방 전체가 파일 내용으로 바뀌므로 확인을 받고, 실행 취소 한 번으로 되돌릴 수 있게 한 덩어리로 기록 */
@@ -549,7 +737,22 @@ setInterval(()=>bkSnap(),6e4);
 const CFG=window.RELMAP||{},SB_URL=CFG.SB_URL||'',SB_KEY=CFG.SB_KEY||'',TS_KEY=CFG.TS_KEY||'';/* Supabase URL·publishable 키·Turnstile 사이트 키. 보통 config.js 에 적습니다(여기에 직접 적어도 됨). 비워 두면 URL·키는 처음 한 번 입력받아 이 브라우저에만 저장합니다. */
 const SB_LIB='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm';
 const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
-let room=null,sb=null,chan=null,rid=null,cst='off',bkFl='',bkT=0,raf=0,ready=false,sending=false,qT=0,hcur=null,fl=[],qd=[],fails=0,lastSel,curT=0,curPend,uiT=0;
+/* 사진 서버(Cloudflare R2): config.js 의 PHOTO(사진 Worker 주소). 비어 있으면 사진을 예전처럼 문서 안(data URL)에 넣음.
+   사진 주소는 이 서버의 '해시.jpg' 모양만 통과시킴(남이 넣은 임의 주소로 보는 사람 브라우저가 외부에 요청하는 것을 막음) */
+const PHOTO=(CFG.PHOTO||lsGet('relmap_photo')||'').replace(/\/+$/,''),PHRE=PHOTO?new RegExp('^'+PHOTO.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'/[0-9a-f]{64}\\.jpg$'):null,
+ imgOk=s=>typeof s=='string'&&((IMG.test(s)&&s.length<=1500000)||!!(PHRE&&PHRE.test(s)));
+/* 사진을 서버에 올리고 주소를 돌려줌. 방 안(게스트도 가능)에서만 올리고, 혼자 쓸 땐 예전처럼 data URL 그대로. 올리기 실패하면 null */
+async function upImg(d){if(!PHOTO||!room||!sb||!d.startsWith('data:image/jpeg'))return d;   /* 서버는 JPEG 만 받음(앱이 붙이는 사진은 항상 JPEG, 불러온 파일의 PNG 등은 문서 안에 그대로) */
+ try{const{data:{session}}=await sb.auth.getSession(),r=await fetch(PHOTO+'/',{method:'PUT',headers:{authorization:'Bearer '+(session&&session.access_token),'content-type':'image/jpeg'},body:await(await fetch(d)).blob()});
+  if(!r.ok)throw new Error('photo '+r.status);const u=(await r.json()).url;if(!PHRE.test(u))throw new Error('photo url');return u}
+ catch(e){console.warn(e);msg('사진을 올리지 못했습니다');return null}}
+/* 문서 안에 data URL 로 들어 있는 사진(인물·그룹 원·시청별 사진)을 서버로 옮김. 같은 사진은 같은 주소가 되므로 여럿이 동시에 눌러도 안전 */
+const dataImgs=()=>S.nodes.flatMap(o=>[o,...(o.im||[])]).filter(x=>typeof x.img=='string'&&x.img.startsWith('data:image/jpeg'));
+async function moveImgs(){let n=0,bad=0;for(const o of S.nodes){let ch=false;for(const x of [o,...(o.im||[])])if(typeof x.img=='string'&&x.img.startsWith('data:image/jpeg')){const u=await upImg(x.img);if(u){x.img=u;ch=true;n++}else bad++}if(ch&&els[o.id])upd(o)}
+ if(n)sv();return[n,bad]}
+/* 보낼 변경이 서버에 다 저장될 때까지 기다림(저장은 비동기라 "옮겼습니다" 직후 새로고침하면 사진이 되돌아왔음). shortcut: 20초까지만, 서버가 더 느리면 안내만 하고 백그라운드 재시도에 맡김 */
+const synced=async()=>{const busy=()=>qT||sending||qd.length||fl.length;for(let i=0;i<40&&busy();i++)await new Promise(r=>setTimeout(r,500));return!busy()}
+let room=null,sb=null,chan=null,rid=null,cst='off',bkFl='',bkT=0,raf=0,ready=false,sending=false,qT=0,hcur=null,fl=[],qd=[],fails=0,lastErr='',lastSel,curT=0,curPend,uiT=0;
 const GZ=new Set(),base=new Map(),sh=new Map(),U=[],R=[],curPos=new Map(),cur=new Map();
 const SKIP=new Set(['vx','vy','fx','fy','base']),jx=v=>JSON.stringify(v),cp=v=>v===undefined?v:JSON.parse(jx(v));
 const eq=(a,b)=>{if(a===b)return true;if(!a||!b||typeof a!='object'||typeof b!='object'||Array.isArray(a)!=Array.isArray(b))return false;const x=Object.keys(a),y=Object.keys(b);return x.length==y.length&&x.every(k=>eq(a[k],b[k]))};
@@ -584,7 +787,10 @@ function renderOthers(){if(!room)return;const o=others(),ids=new Set();
  cur.forEach((c,id)=>{if(!ids.has(id)){c.el.remove();cur.delete(id);curPos.delete(id)}});rs()}
 function curLoop(){raf=requestAnimationFrame(curLoop);const k=S.view?S.view.k:1;
  cur.forEach(c=>{if(c.t){if(!c.on){c.x=c.t.x;c.y=c.t.y;c.on=true}else{c.x+=(c.t.x-c.x)*.35;c.y+=(c.t.y-c.y)*.35}c.el.style.transform=`translate(${c.x}px,${c.y}px) scale(${1/k})`;c.el.style.opacity=1}else{c.on=false;c.el.style.opacity=0}})}
-function sendCur(c){curPend=c;if(curT)return;curT=setTimeout(()=>{curT=0;if(chan&&ready&&chan.state=='joined'&&curPend!==undefined)chan.send({type:'broadcast',event:'cur',payload:{k:myKey,c:curPend}});curPend=undefined},70)}
+/* 서버는 초당 메시지 수에 한도가 있고(무료 100개, 보낸 것+받은 것 모두 셈) 커서는 사람 수의 제곱으로 늘어남(N명이 계속 움직이면 초당 약 14·N² 개).
+   그래서 사람이 많을수록 커서를 덜 자주 보내고(2명 80ms, 3명 180ms, 5명 500ms, 최대 1초), 혼자면 아예 안 보냄 */
+const curMs=()=>Math.min(1000,Math.max(70,20*(others().length+1)**2));
+function sendCur(c){curPend=c;if(curT)return;curT=setTimeout(()=>{curT=0;if(chan&&ready&&chan.state=='joined'&&curPend!==undefined&&others().length)chan.send({type:'broadcast',event:'cur',payload:{k:myKey,c:curPend}});curPend=undefined},curMs())}
 function onCur(p){if(!p||typeof p.k!='string'||p.k==myKey)return;const c=p.c&&Number.isFinite(p.c.x)&&Number.isFinite(p.c.y)?{x:+p.c.x,y:+p.c.y}:null;curPos.set(p.k,c);const o=cur.get(p.k);if(o)o.t=c}
 
 /* ---- 문서 동기화 ----
@@ -606,18 +812,41 @@ function diff(rec=true){if(!ready)return 0;const seen=new Set(),ops=[];
 function enqueue(ops){ops.forEach(o=>{const key=ek(o.k,o.id);let last=null;for(let i=qd.length-1;i>=0;i--)if(ek(qd[i].k,qd[i].id)==key){last=qd[i];break}
   if(o.set&&last&&last.set&&!last.put&&!last.del){(o.rm||[]).forEach(f=>{delete last.set[f];if(!(last.rm||[]).includes(f))(last.rm=last.rm||[]).push(f)});for(const f in o.set){last.set[f]=o.set[f];if(last.rm)last.rm=last.rm.filter(x=>x!=f)}}
   else qd.push(o)});pump()}
+/* 서버로 보내는 간격(내 변경 묶음 사이): 같은 방 사람 수만큼 길게(최대 0.4초). 남의 변경이 올 때마다 내 변경도 바로 되돌려 보내면 사람 수의 제곱으로 폭증해서,
+   보내기 사이에 쉬는 동안 같은 항목의 변경은 enqueue 가 하나로 합침 */
+const gap=()=>Math.min(400,50*others().length);let lastSend=0;
+/* 서버가 확정한 행(ver 포함)을 같은 방 사람들에게 Broadcast 로 바로 전달(메시지 한 번에 여러 행).
+   DB 변경 알림(Postgres Changes)은 받는 사람 수만큼 권한 검사를 하고 한 줄로 처리돼서 사람이 많을수록 느려지므로, Broadcast 를 주 경로로 씀.
+   200KB 가 넘는 행은 보내지 않음(256KB 한도) — 그건 4초 폴링·재접속 때 받음. 옛 방식도 같이 받으려면 PGCH 를 true 로 */
+const PGCH=false;
+/* 사진(img·im)은 행 크기의 대부분인데 위치만 바꿔도 행 전체가 오가서 egress 를 크게 먹었음(5GB 무료 한도를 며칠 만에 넘김).
+   → 서버 응답(SQL 이 img·im 을 빼고 h:true 표시)·Broadcast(내가 사진을 안 건드렸으면 빼고 h:1)에서 사진을 빼고, 받는 쪽은 이미 가진 사진으로 채움.
+   사진이 새로 생기거나 바뀌거나 지워진 변경은 사진까지 통째로 보냄. 행에 h 가 없으면(예전 SQL·파일·전체 불러오기) 그대로 믿음 */
+const HV=['img','im'];
+function fillHeavy(r,ops){if(!r.h||r.deleted)return r;const b=base.get(ek(r.kind,r.id)),d={...(r.data||{})};
+ for(const f of HV){let v=b&&!b.del?b.data[f]:undefined;
+  for(const o of ops||[]){if(o.k!=r.kind||o.id!=r.id)continue;if(o.put)v=o.put[f];else{if((o.rm||[]).includes(f))v=undefined;if(o.set&&f in o.set)v=o.set[f]}}
+  if(v!==undefined)d[f]=v}
+ return{...r,data:d,h:0}}
+function bcRows(rows,ops){if(!chan||chan.state!='joined'||!others().length)return;let a=[],n=0;
+ const flush=()=>{if(a.length)Promise.resolve(chan.send({type:'broadcast',event:'rows',payload:{k:myKey,rows:a}})).catch(()=>{});a=[];n=0};
+ for(const x of rows||[]){let r={kind:x.kind,id:x.id,ver:x.ver,data:x.data,deleted:x.deleted};
+  const touched=(ops||[]).some(o=>o.k==r.kind&&o.id==r.id&&(o.put||HV.some(f=>(o.rm||[]).includes(f)||(o.set&&f in o.set))));
+  if(!touched&&!r.deleted&&r.data&&HV.some(f=>f in r.data)){const d={...r.data};HV.forEach(f=>delete d[f]);r={...r,data:d,h:1}}
+  const z=jx(r).length;if(z>200000)continue;if(n+z>200000)flush();a.push(r);n+=z}flush()}
 async function pump(){if(sending||!ready)return;sending=true;
- try{while(qd.length){fl=qd.splice(0,400);let r;try{r=await sb.rpc('apply_ops',{p_room:rid,p_ops:fl})}catch(e){r={error:e}}
-   if(r.error){qd=fl.concat(qd);fl=[];fails++;console.warn('apply_ops',r.error);if(fails==3)msg('저장이 지연되고 있습니다…');
+ try{while(qd.length){const w=lastSend+gap()-Date.now();if(w>0)await new Promise(z=>setTimeout(z,w));if(!qd.length)break;fl=qd.splice(0,400);lastSend=Date.now();let r;try{r=await sb.rpc('apply_ops',{p_room:rid,p_ops:fl})}catch(e){r={error:e}}
+   if(r.error){qd=fl.concat(qd);fl=[];fails++;lastErr=String(r.error.message||r.error).slice(0,100);console.warn('apply_ops',r.error);if(fails==3)msg('저장이 지연되고 있습니다…');
     if(/not a member/i.test(r.error.message||''))try{await sb.rpc('join_room',{p_room:rid})}catch(e){}
     await new Promise(z=>setTimeout(z,Math.min(8000,400*2**fails)));continue}
    fails=0;const done=fl;fl=[];
     /* 응답이 늦어 그 사이 더 새로운 변경 이벤트가 먼저 왔다면, 보내는 중이던 변경을 새 값 위에 덧씌워 보고 있었으므로 → 응답 후 해당 항목을 반드시 다시 맞춤 */
-    ingestMany((r.data||[]).map(x=>({kind:x.k,id:x.id,ver:x.ver,data:x.data,deleted:x.deleted})),done.map(o=>ek(o.k,o.id)))}}
+    const rows=(r.data||[]).map(x=>fillHeavy({kind:x.k,id:x.id,ver:x.ver,data:x.data,deleted:x.deleted,h:x.h},done));
+    ingestMany(rows,done.map(o=>ek(o.k,o.id)));bcRows(rows,done)}}
  finally{sending=false}}
 /* 서버에서 온 행(이벤트·응답·재접속 시 전체 불러오기)을 반영. 더 오래된 번호(ver)의 행은 무시 */
 function ingestMany(rows,extra){if(!ready)return;diff();const keys=[];
- rows.forEach(r=>{if(!idOk(r.id)||(r.kind!='n'&&r.kind!='l'))return;const key=ek(r.kind,r.id),b=base.get(key),v=+r.ver;if(b&&b.ver>=v)return;const d=r.deleted?null:cleanEnt(r.kind,r.data);base.set(key,{ver:v,data:d||{},del:!d});keys.push(key)});
+ rows.forEach(r=>{if(!idOk(r.id)||(r.kind!='n'&&r.kind!='l'))return;const key=ek(r.kind,r.id),b=base.get(key),v=+r.ver;if(b&&b.ver>=v)return;const d=r.deleted?null:cleanEnt(r.kind,r.data);base.set(key,{ver:v,data:d||{},del:!d});keys.push(key)});cMark(keys);
  (extra||[]).forEach(k=>{if(!keys.includes(k))keys.push(k)});keys.forEach(recon);if(keys.length)uiq()}
 const dragging=(k,id)=>k=='n'&&drag&&((drag.n&&drag.n.id==id)||(drag.kids||[]).some(x=>x[0].id==id));
 function recon(key){const want=view(key),have=sh.get(key);if(want===undefined&&have===undefined)return;if(want!==undefined&&have!==undefined&&eq(want,have))return;
@@ -629,11 +858,11 @@ function setLocal(k,id,want){const arr=k=='n'?S.nodes:S.links;let n=arr.find(x=>
  const moved=k=='n'&&['x','y','w','h'].some(f=>!eq(n[f],want[f]));
  for(const f in want)if(!eq(n[f],want[f]))n[f]=cp(want[f]);
  for(const f in n){if(f=='id'||SKIP.has(f)||f[0]=='_')continue;if(!(f in want))delete n[f]}
- if(k=='n'){upd(n);const e=els[id];if(moved&&e){e.classList.add('tw');clearTimeout(e._tw);e._tw=setTimeout(()=>e.classList.remove('tw'),200)}}}
+ if(k=='n'){upd(n);if(n.t=='c')ordG();const e=els[id];if(moved&&e){e.classList.add('tw');clearTimeout(e._tw);e._tw=setTimeout(()=>e.classList.remove('tw'),200)}}}
 function dropLocal(k,id){if(k=='n'){S.nodes=S.nodes.filter(x=>x.id!=id);if(els[id]){els[id].remove();delete els[id]}hov=null;Object.values(els).forEach(e=>e.classList.remove('dim'))}
  else{S.links=S.links.filter(x=>x.id!=id);if(lels[id]){lels[id].remove();delete lels[id]}}}
-function uiq(){if(uiT)return;uiT=requestAnimationFrame(()=>{uiT=0;drawLinks();wkRef();if(sel&&!obj(sel))select(null);else if(ins.style.display=='block'&&!ins.contains(document.activeElement))panel()})}
-CB.q=()=>{if(!room||!ready||qT)return;qT=setTimeout(()=>{qT=0;diff()},80)};
+function uiq(){if(uiT)return;uiT=requestAnimationFrame(()=>{uiT=0;drawLinks();wkRef();if(pfId!=null)pfRender();if(sel&&!obj(sel))select(null);else if(ins.style.display=='block'&&!ins.contains(document.activeElement))panel()})}
+CB.q=()=>{if(!room||!ready||qT)return;qT=setTimeout(()=>{qT=0;diff()},Math.max(80,gap()))};
 
 /* ---- 실행 취소 / 다시 실행 (사용자별, 직접 구현) ----
    기록 한 칸 = 항목별 {이전 값, 이후 값}. 되돌릴 땐 '내가 바꾼 필드'만 원래 값으로 돌리므로 다른 사람이 바꾼 다른 필드는 그대로 남음.
@@ -652,7 +881,23 @@ CB.ge=k=>{if(!GZ.delete(k))return;if(!GZ.size){diff();hclose()}if(k=='d')reconAl
 CB.hist=histMove;
 
 /* ---- 방 입장 ---- */
-async function loadAll(){const rows=[];for(let from=0;;from+=1000){const{data,error}=await sb.from('items').select('kind,id,data,deleted,ver').eq('room',rid).order('ver').range(from,from+999);if(error)throw error;rows.push(...data);if(data.length<1000)break}return rows}
+async function loadAll(since=0,light){const rows=[];for(let from=0;;from+=1000){let q=sb.from('items').select(light?'kind,id,deleted,ver':'kind,id,data,deleted,ver').eq('room',rid);if(since)q=q.gt('ver',since);const{data,error}=await q.order('ver').range(from,from+999);if(error)throw error;rows.push(...data);if(data.length<1000)break}return rows}
+/* 다시 맞출 땐 전부 말고 '내가 아는 가장 큰 번호(ver) 근처 이후'만 받음(사진이 든 큰 방에서 탭을 오갈 때마다 전부 받던 것을 줄임).
+   번호는 방 전체가 아니라 서버 전체에서 매겨지고 커밋 순서가 조금 뒤바뀔 수 있어서 1000 만큼 겹쳐서 받음 */
+const maxVer=()=>{let m=0;base.forEach(b=>{if(b.ver>m)m=b.ver});return m};
+/* 방 문서 브라우저 캐시(IndexedDB, 행 하나 = 항목 하나): 다시 들어올 때 사진이 든 문서 전체를 또 받지 않고 바뀐 것만 받음(egress 절약).
+   서버 확정 상태(base)만 저장(2초 모아서, 탭을 숨길 때 바로). 못 쓰는 환경(시크릿 창 등)이면 없는 셈 치고 전부 받음. 읽을 때도 adopt 가 cleanEnt 로 검증함.
+   shortcut: 방별 캐시를 안 지움(오래된 방 정리 없음) — 용량이 문제 되면 오래된 방부터 지울 것 */
+let idbP=null,cQ=new Set(),cT=0;
+const idb=()=>idbP||(idbP=new Promise((ok,no)=>{const q=indexedDB.open('relmap',1);q.onupgradeneeded=()=>q.result.createObjectStore('rows');q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})),
+ cRange=()=>IDBKeyRange.bound(rid+'|',rid+'|￿'),
+ cTx=f=>idb().then(d=>new Promise((ok,no)=>{const t=d.transaction('rows','readwrite'),r=f(t.objectStore('rows'));t.oncomplete=()=>ok(r&&r.result);t.onerror=t.onabort=()=>no(t.error)})),
+ cLoad=()=>cTx(s=>s.getAll(cRange())).then(a=>(a||[]).filter(r=>r&&(r.kind=='n'||r.kind=='l')&&Number.isSafeInteger(+r.ver))).catch(()=>[]),
+ cClear=()=>{cQ.clear();return cTx(s=>s.delete(cRange())).catch(()=>{})};
+function cMark(keys){if(!rid||!keys.length)return;keys.forEach(k=>cQ.add(k));if(!cT)cT=setTimeout(cFlush,2000)}
+function cFlush(){clearTimeout(cT);cT=0;if(!cQ.size)return;const ks=[...cQ];cQ.clear();
+ cTx(s=>ks.forEach(k=>{const b=base.get(k);const key=rid+'|'+k;if(b&&!b.del){const[kind,id]=sp(k),g=s.get(key);g.onsuccess=()=>{if(!g.result||g.result.ver<=b.ver)s.put({kind,id,ver:b.ver,data:b.data,deleted:false},key)}}else s.delete(key)})).catch(()=>{})}   /* 같은 방을 연 다른 탭이 더 새 행을 넣어 뒀으면 덮어쓰지 않음(옛 값이 남으면 번호 겹침 구간 밖이라 영영 못 따라잡음) */
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='hidden')cFlush()});
 function adopt(rows){wsLoad();alpha=0;man=0;S.nodes=[];S.links=[];base.clear();sh.clear();qd=[];fl=[];U.length=R.length=0;hcur=null;GZ.clear();
  clearDom();
  rows.forEach(r=>{if(!idOk(r.id)||(r.kind!='n'&&r.kind!='l'))return;const key=ek(r.kind,r.id),d=r.deleted?null:cleanEnt(r.kind,r.data);base.set(key,{ver:+r.ver,data:d||{},del:!d});if(!d)return;const o={...cp(d),id:r.id};(r.kind=='n'?S.nodes:S.links).push(o);sh.set(key,ent(o))});
@@ -671,6 +916,7 @@ function explain(e){const m=String((e&&e.message)||e||'');
   if(/no captcha_token|captcha_token/i.test(m))return TS_KEY?'Supabase 가 캡차 증표를 받지 못했습니다. Supabase 의 CAPTCHA 제공자가 Turnstile 로 설정되어 있는지 확인해 주세요.':'Supabase 에서 CAPTCHA 보호가 켜져 있으나 Turnstile 사이트 키가 없습니다. config.js 의 TS_KEY 에 사이트 키를 넣거나, Supabase 에서 CAPTCHA 보호를 꺼 주세요.';
   if(/verification|invalid|failed/i.test(m)&&!/Turnstile/.test(m))return'캡차 확인에 실패했습니다. Supabase 에 넣은 Turnstile 비밀 키(Secret key)가 위젯과 짝이 맞는지 확인해 주세요.';
   return m.replace(/^captcha:\s*/,'')}
+ if(RTU&&/TIMED_OUT|CHANNEL_ERROR|realtime relay/i.test(m))return'실시간 중계 서버에 연결하지 못했습니다. config.js 의 REALTIME 주소와 중계 Worker 배포(worker/README.md), Worker 의 SB_URL·SB_KEY 를 확인해 주세요.';
  if(/anonymous sign-ins are disabled/i.test(m))return'Supabase 대시보드 → Authentication → Sign In / Providers 에서 "Allow anonymous sign-ins" 를 켜 주세요.';
  if(/could not find the function|PGRST202|42883/i.test(m))return'supabase_schema.sql 을 SQL Editor 에서 실행했는지 확인해 주세요.';
  if(/RealtimeDisabledForConfiguration|not enabled for realtime/i.test(m))return'items 표의 Realtime 이 꺼져 있습니다. supabase_schema.sql 맨 끝의 publication 부분을 실행해 주세요.';
@@ -680,49 +926,112 @@ function explain(e){const m=String((e&&e.message)||e||'');
    모바일은 화면을 끄거나 다른 앱으로 가면 실시간 연결이 끊기고, 서버가 채널을 닫으면(CLOSED) 라이브러리는 자동으로 다시 붙지 않음.
    → 채널이 닫히거나 오래 복구되지 않으면 새 채널을 만들어 다시 연결하고, 돌아왔을 때는 놓친 변경을 다시 불러옴.
    (내 변경은 별도의 HTTP 요청으로 보내므로 연결이 끊긴 동안에도 저장되고, 실패하면 자동으로 재시도) */
-let rcT=0,rcN=0,hiddenAt=0,closing=false;
-function newChan(){const c=sb.channel('relmap:'+rid,{config:{broadcast:{self:false},presence:{key:myKey,enabled:true},postgres_changes_options:{wait:true}}});
- c.on('postgres_changes',{event:'*',schema:'public',table:'items',filter:'room=eq.'+rid},p=>{const r=p.new;if(r&&r.kind&&r.id)ingestMany([{kind:r.kind,id:r.id,ver:r.ver,data:r.data,deleted:r.deleted}])});
+let rcT=0,rcN=0,closing=false;
+/* 실시간 중계(Cloudflare Durable Object): config.js 의 REALTIME(중계 Worker 주소, 테스트는 localStorage relmap_rt). 있으면 Supabase Realtime 대신 이 서버로 커서·접속자·문서 변경을 주고받음
+   (Supabase 실시간 메시지 월 200만 한도를 피함). 문서 저장·로그인은 그대로 Supabase. supabase-js 채널과 같은 모양(on·subscribe·send·track·untrack·presenceState·state)으로 만들어서 나머지 연결 코드는 그대로 씀.
+   규칙은 worker/relay.mjs. 한 번 끝난(닫힌) 객체는 다시 쓰지 않고 앱이 새로 만듦(rebuild) */
+const RTU=(CFG.REALTIME||lsGet('relmap_rt')||'').replace(/\/+$/,'').replace(/^http/,'ws');
+class RtChan{
+ constructor(){this.state='closed';this.h={};this.pr={};this.ack=new Map();this.seq=0;this.dead=false}
+ on(t,f,cb){if(t=='broadcast')this.h[f.event]=cb;else if(t=='presence')this.ps=cb;return this}
+ subscribe(cb){(async()=>{
+  let tok='';try{tok=(await sb.auth.getSession()).data.session.access_token}catch(e){}
+  if(this.dead)return;
+  const ws=this.ws=new WebSocket(RTU+'/room/'+rid+'?k='+myKey),fin=(st,err)=>{if(this.dead)return;this.close();cb(st,err)},to=setTimeout(()=>fin('TIMED_OUT'),10000);
+  ws.onopen=()=>ws.send(JSON.stringify({t:'auth',token:tok}));
+  ws.onerror=()=>{};   /* 곧 onclose 가 옴 */
+  ws.onclose=()=>{clearTimeout(to);fin(this.state=='joined'?'CLOSED':'CHANNEL_ERROR',new Error('realtime relay closed'))};   /* 접속 전에 닫혔으면(로그인 거부·주소 오류) 오류, 접속 뒤면 끊김 */
+  ws.onmessage=e=>{if(this.dead||typeof e.data!='string')return;this.lp=Date.now();if(e.data=='pong')return;let m;try{m=JSON.parse(e.data)}catch(x){return}
+   if(m.t=='hello'){clearTimeout(to);this.state='joined';this.lp=Date.now();
+    this.hb=setInterval(()=>{if(Date.now()-this.lp>35000)return fin('CLOSED');try{ws.send('ping')}catch(x){}},12000);cb('SUBSCRIBED')}   /* 12초마다 확인, 35초 동안 아무 소리가 없으면 끊긴 것으로 봄(반쯤 죽은 연결 감지) */
+   else if(m.t=='pres'&&m.s&&typeof m.s=='object'){this.pr=Object.fromEntries(Object.entries(m.s).map(([k,p])=>[k,[p]]));this.ps&&this.ps()}
+   else if(m.t=='b'){const f=this.h[m.e];f&&f({payload:m.p})}
+   else if(m.t=='ack'){const r=this.ack.get(m.id);if(r){this.ack.delete(m.id);r('ok')}}}})()}
+ send(m){if(this.state=='joined')try{this.ws.send(JSON.stringify({t:'b',e:m.event,p:m.payload}))}catch(e){}return Promise.resolve('ok')}
+ track(p,o){return new Promise(res=>{if(this.state!='joined')return res('error');const id=++this.seq;this.ack.set(id,res);
+  try{this.ws.send(JSON.stringify({t:'track',p,id}))}catch(e){this.ack.delete(id);return res('error')}
+  setTimeout(()=>{if(this.ack.delete(id))res('timed out')},(o&&o.timeout)||10000)})}
+ untrack(){if(this.state=='joined')try{this.ws.send('{"t":"untrack"}')}catch(e){}}
+ presenceState(){return this.pr}
+ close(){this.dead=true;this.state='closed';clearInterval(this.hb);try{this.ws&&this.ws.close()}catch(e){}return Promise.resolve('ok')}}
+const rmChan=c=>c instanceof RtChan?c.close():sb.removeChannel(c);
+function newChan(){const c=RTU?new RtChan():sb.channel('relmap:'+rid,{config:{broadcast:{self:false},presence:{key:myKey,enabled:true},postgres_changes_options:{wait:true}}});
+ if(PGCH&&!RTU)c.on('postgres_changes',{event:'*',schema:'public',table:'items',filter:'room=eq.'+rid},p=>{const r=p.new;if(!r||!r.kind||!r.id)return;if(!r.deleted&&(!r.data||typeof r.data!='object'))return resync();   /* 너무 커서 내용이 잘려 온 행은 직접 다시 받음 */
+  ingestMany([{kind:r.kind,id:r.id,ver:r.ver,data:r.data,deleted:r.deleted}])});
  c.on('broadcast',{event:'cur'},m=>onCur(m.payload));
+ c.on('broadcast',{event:'rows'},m=>{const p=m.payload;if(!p||p.k==myKey||!Array.isArray(p.rows))return;const mv=maxVer()+1e6;   /* 남이 보낸 값이라 번호·내용 모양을 확인(번호를 터무니없이 크게 보내 이후 변경을 막는 것 방지) */
+  let need=false;const rows=[];
+  for(const r of p.rows.slice(0,500)){if(!(r&&Number.isSafeInteger(+r.ver)&&+r.ver>0&&+r.ver<=mv&&(r.deleted===true||(r.data&&typeof r.data=='object'&&!Array.isArray(r.data)))))continue;
+   if(r.h&&!r.deleted){const b=base.get(ek(r.kind,r.id));if(!b||b.del){need=true;continue}rows.push(fillHeavy(r))}else rows.push(r)}   /* 사진이 빠진 행인데 내가 그 항목을 모르면 직접 받음 */
+  if(rows.length)ingestMany(rows);if(need)resync()});
  c.on('presence',{event:'sync'},renderOthers);return c}
-const resync=()=>loadAll().then(ingestMany).catch(e=>console.warn('resync',e));
+/* 놓친 변경 따라잡기(egress 절약): ① 번호·삭제 여부만 먼저 받아(행당 수십 바이트) ② 내가 모르는 새 번호인 행만 내용(사진 포함)을 받음.
+   예전엔 겹쳐 받는 구간의 행을 사진까지 매번 다시 받았음. 돌려주는 값 = 새로 받은 행 수 */
+async function catchUp(margin){const lite=await loadAll(Math.max(0,maxVer()-margin),true);
+ const need=lite.filter(r=>{const b=base.get(ek(r.kind,r.id));return!b||b.ver<+r.ver});if(!need.length)return 0;
+ const rows=need.filter(r=>r.deleted).map(r=>({...r,data:{}})),live=need.filter(r=>!r.deleted);
+ for(let i=0;i<live.length;i+=50){const{data,error}=await sb.from('items').select('kind,id,data,deleted,ver').eq('room',rid).in('id',live.slice(i,i+50).map(r=>r.id));if(error)throw error;rows.push(...data)}
+ ingestMany(rows);return need.length}
+const resync=()=>catchUp(1000).catch(e=>console.warn('resync',e));
 const scheduleRecon=ms=>{clearTimeout(rcT);rcT=setTimeout(rebuild,ms)};
 function subChan(c,first){return new Promise((res,rej)=>{let f=true;c.subscribe((st,err)=>{
  if(c!==chan||closing)return;   /* 교체된 옛 채널의 알림은 무시 */
  if(st=='SUBSCRIBED'){clearTimeout(rcT);rcN=0;cst='connected';renderBk();trackMe();if(f){f=false;res()}if(ready)resync()}
  else if(st=='CHANNEL_ERROR'||st=='TIMED_OUT'){if(f&&first){f=false;rej(err||new Error(st))}else{cst='reconnecting';renderBk();scheduleRecon(6000)}}
- else if(st=='CLOSED'){cst='reconnecting';renderBk();scheduleRecon(300)}})})}
-async function rebuild(){if(!room||!ready||closing)return;cst='reconnecting';renderBk();
- try{await sb.auth.getSession();try{await sb.realtime.setAuth()}catch(e){}
-  const old=chan;chan=newChan();room=chan;try{sb.removeChannel(old)}catch(e){}
-  subChan(chan,false);scheduleRecon(Math.min(20000,4000*2**rcN++))}   /* 이번 시도가 끝내 성공하지 못하면 다시 시도(성공하면 취소됨) */
- catch(e){console.warn('rebuild',e);scheduleRecon(Math.min(20000,2000*2**rcN++))}}
-function wake(force){if(!room||!ready||closing)return;const away=hiddenAt?Date.now()-hiddenAt:0;hiddenAt=0;
- if(force||away>10000||!chan||chan.state!='joined')rebuild();else resync()}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='hidden')hiddenAt=Date.now();else wake()});
+ else if(st=='CLOSED'){cst='reconnecting';renderBk();scheduleRecon(300+Math.random()*1200)}})})}   /* 서버가 한꺼번에 끊으면 모두가 동시에 다시 붙지 않게 시간을 흩음 */
+/* 라이브러리는 같은 이름의 채널을 하나만 돌려주고, 이미 구독한 채널엔 on() 이 오류를 냄 → 옛 채널을 먼저 완전히 치운 뒤 새로 만들어야 함
+   (예전엔 newChan() 이 먼저라서, 연결이 살아 있는 채로 rebuild 하면 계속 실패해 "다시 연결 중…" 에 갇혔음) */
+async function dropChan(c){if(!c)return;try{await Promise.race([rmChan(c),new Promise(r=>setTimeout(r,1500))])}catch(e){}
+ const a=sb.getChannels&&sb.getChannels(),i=a?a.indexOf(c):-1;if(i>=0){try{c.teardown&&c.teardown()}catch(e){}a.splice(i,1)}}   /* shortcut: 죽은 소켓이라 removeChannel 이 안 끝날 때만 라이브러리 목록을 직접 줄임, 라이브러리가 바뀌면 확인 */
+let rbBusy=false;
+async function rebuild(hard){if(!room||!ready||closing||rbBusy)return;rbBusy=true;cst='reconnecting';renderBk();
+ try{const old=chan;chan=null;await dropChan(old);if(hard===true&&!RTU)try{sb.realtime.disconnect()}catch(e){}   /* 소켓이 죽었을 수 있을 때만 소켓도 새로 */
+  await sb.auth.getSession();if(!RTU)try{await sb.realtime.setAuth()}catch(e){}
+  if(closing)return;chan=newChan();room=chan;
+  subChan(chan,false);scheduleRecon(Math.min(30000,15000*2**rcN++))}   /* 이번 시도가 끝내 성공하지 못하면 다시 시도(성공하면 취소됨). 라이브러리 접속 제한시간(10초+)보다 길어야 함 */
+ catch(e){console.warn('rebuild',e);scheduleRecon(Math.min(20000,2000*2**rcN++))}
+ finally{rbBusy=false}}
+/* 돌아왔을 때: 연결이 멀쩡하면(서버가 4초 안에 응답) 그대로 두고 놓친 변경만 받음. 응답이 없거나 이미 끊겼으면 새로 연결 */
+async function wake(force){if(!room||!ready||closing)return;const c=chan;
+ if(force||!c||c.state!='joined')return rebuild(true);
+ let r='';try{r=await c.track({name:me.name,color:me.color,sel:me.sel},{timeout:4000})}catch(e){}
+ if(closing||c!==chan)return;r=='ok'?resync():rebuild(true)}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible')wake()});
 window.addEventListener('online',()=>wake(true));
 window.addEventListener('pageshow',e=>{if(e.persisted)wake(true)});
-async function enter(url,key,id){cst='connecting';ready=false;renderBk();
+/* 안전망: 실시간 이벤트가 조용히 빠져도(연결은 멀쩡해 보이는데 변경이 안 오는 경우) 4초마다 '새로 바뀐 것만' 받아 따라잡음(요청 한 번, 보통 빈 응답).
+   실시간으로 못 받은 변경이 있었으면 콘솔에 남기고 __missed 로 센다 — 자주 보이면 서버 쪽(한도·Realtime 상태)을 의심할 것 */
+let pollB=false;window.__missed=0;
+setInterval(async()=>{if(pollB||!room||!ready||closing||document.visibilityState!='visible'||!chan||chan.state!='joined'||sending||qd.length||!others().length)return;pollB=true;   /* 혼자일 땐 받을 변경이 없으니 쉼 */
+ try{const n=await catchUp(20);if(n){window.__missed+=n;console.warn('실시간으로 못 받아 폴링으로 받은 변경',n)}}catch(e){}finally{pollB=false}},4000);
+/* mine: 이 브라우저가 방을 새로 만든 경우(주소에 방이 없었음). 처음 문서를 채우는 건 방을 만든 사람뿐 —
+   손님이 먼저 들어와 빈(또는 자기) 문서로 선점해 버려서 방장 문서가 사라지는 일을 막음 */
+async function enter(url,key,id,mine){cst='connecting';ready=false;renderBk();
  try{await getSb(url,key);
   const{data:{session}}=await sb.auth.getSession();if(!session){const tok=await captcha(),{error}=await sb.auth.signInAnonymously(tok?{options:{captchaToken:tok}}:undefined);if(error)throw error}
   rid=id;const{data:seeded,error:je}=await sb.rpc('join_room',{p_room:id});if(je)throw je;
-  chan=newChan();room=chan;await subChan(chan,true);
-  let rows=await loadAll();
-  if(!seeded&&!rows.length){const{data:won,error:se}=await sb.rpc('seed_room',{p_room:id});if(se)throw se;
+  chan=newChan();room=chan;const subP=subChan(chan,true);subP.catch(()=>{});   /* 접속과 문서 받기를 동시에 */
+  let rows=await cLoad(),cached=rows.length>0;
+  if(cached){   /* 서버가 예전 상태로 되돌려졌으면(백업 복원 등) 캐시가 더 새것이 돼 이후 변경이 무시되므로 버림: 서버에 내 캐시의 가장 큰 번호 이상인 행이 하나도 없으면 */
+   const top=rows.reduce((m,r)=>Math.max(m,+r.ver),0),{data:t,error:te}=await sb.from('items').select('ver').eq('room',rid).gt('ver',top-1).range(0,0);if(te)throw te;
+   if(!t.length){rows=[];cached=false;await cClear()}}
+  if(!cached)rows=await loadAll();
+  if(!seeded&&!rows.length&&mine){const{data:won,error:se}=await sb.rpc('seed_room',{p_room:id});if(se)throw se;
    if(won){const ops=[...S.nodes.map(o=>({k:'n',id:o.id,put:ent(o)})),...S.links.map(o=>({k:'l',id:o.id,put:ent(o)}))];
-    for(let i=0;i<ops.length;i+=100){const{error}=await sb.rpc('apply_ops',{p_room:id,p_ops:ops.slice(i,i+100)});if(error)throw error}}
-   rows=await loadAll()}
-  adopt(rows);ready=true;diff(false);hs();trackMe();renderBk();renderOthers();curLoop();refreshAcct()}
- catch(e){console.error(e);try{if(chan)sb.removeChannel(chan)}catch(x){}room=null;chan=null;ready=false;cancelAnimationFrame(raf);cst='off';renderBk();msg('연결 실패');alert('공동 편집을 시작하지 못했습니다.\n\n'+explain(e))}}
+    for(let i=0;i<ops.length;i+=100){const{data,error}=await sb.rpc('apply_ops',{p_room:id,p_ops:ops.slice(i,i+100)});if(error)throw error;rows.push(...(data||[]).map(x=>fillHeavy({kind:x.k,id:x.id,ver:x.ver,data:x.data,deleted:x.deleted,h:x.h},ops.slice(i,i+100))))}}
+   else rows=await loadAll()}
+  await subP;
+  adopt(rows);if(!cached)cMark([...base.keys()]);ready=true;diff(false);hs();trackMe();renderBk();renderOthers();curLoop();refreshAcct();resync()}   /* 접속 전에 놓친 변경은 마지막에 한 번 더 받아 메움 */
+ catch(e){console.error(e);try{if(chan)rmChan(chan)}catch(x){}room=null;chan=null;ready=false;cancelAnimationFrame(raf);cst='off';renderBk();msg('연결 실패');alert('공동 편집을 시작하지 못했습니다.\n\n'+explain(e))}}
 async function start(){let url=SB_URL||lsGet('relmap_sburl')||'',key=SB_KEY||lsGet('relmap_sbkey')||'';
  if(!url||!key){url=(prompt('Supabase 프로젝트 URL')||'').trim();if(!url)return;
   key=(prompt('Supabase publishable 키\n※ secret / service_role 키는 절대 넣지 마세요')||'').trim();if(!key)return;
   let role='';try{role=JSON.parse(atob(key.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role}catch(e){}
   if(!/^https?:\/\/[\w.:-]+\/?$/.test(url)||/^sb_secret_/.test(key)||role=='service_role'){msg('URL 또는 키가 올바르지 않습니다');return}
   url=url.replace(/\/$/,'');lsSet('relmap_sburl',url);lsSet('relmap_sbkey',key)}
- const id=roomFromHash()||newId();try{history.replaceState(null,'','#room='+id)}catch(e){}
- await enter(url,key,id)}
-function stop(){closing=true;clearTimeout(rcT);try{if(chan){chan.untrack();sb.removeChannel(chan)}}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}location.reload()}
+ const had=roomFromHash(),id=had||newId();try{history.replaceState(null,'','#room='+id)}catch(e){}
+ await enter(url,key,id,!had)}
+function stop(){closing=true;clearTimeout(rcT);try{if(chan){chan.untrack();rmChan(chan)}}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}location.reload()}
 $('#bk').onclick=()=>room?dlShow(dl.style.display=='block'&&dlKind=='share'?'':'share'):S.lock?msg('감상용 파일은 공동 편집으로 변경할 수 없습니다.'):start();$('#bx').onclick=stop;
 
 /* 계정·저장: 로그인(이메일 링크·Google)한 사람만 저장(서버·파일)할 수 있고, 게스트(로그인 안 함)는 공유받은 방에 들어가 함께 수정만 할 수 있음.
@@ -770,15 +1079,40 @@ function renderDl(){const k=dlKind,n=dlNote?`<label>${esc(dlNote)}</label>`:'',X
  else if(k=='newpw')h=`<div class="au"><div class="brand">RelMap</div><h1>새 비밀번호</h1><p class="sub">새로 사용할 비밀번호를 설정해 주세요.</p>${nm}<label class="fld" for="au-n">새 비밀번호</label><input id="au-n" type="password" data-dp placeholder="새 비밀번호" autocomplete="new-password"><button class="pb" data-da="setpw">변경</button><button data-da="x">나중에 하기</button></div>`;
  else if(k=='account')h=`<h3>내 계정</h3><label>${esc(member&&member.email)} 로 로그인 중</label>${n}<div class="row"><button data-da="list">내 관계도</button><button data-da="out">로그아웃</button>${X}</div>`;
  else if(k=='auto'){const a=bkList();h=`<h3>자동 백업</h3><label>${a.length?'되돌릴 시점을 고르세요. 지금 화면은 복원 전에 새 백업으로 보관됩니다.':'아직 자동 백업이 없습니다.'}</label>${n}`+a.map((b,i)=>`<div class="row"><button data-da="rs" data-i="${i}">${esc(new Date(b.t).toLocaleString('ko-KR',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}))} · 인물 ${+b.n||0} · 선 ${+b.l||0}</button></div>`).join('')+`<div class="row">${X}</div>`}
- else if(k=='share')h=`<h3>링크 공유</h3><div class="row"><button data-da="le">편집용 링크 복사</button></div>${n}<div class="row">${X}</div>`;
+ else if(k=='theme')h='<h3>화면 모드</h3>'+[['light','라이트'],['dark','다크'],['system','시스템 설정']].map(([v,t])=>`<div class="row"><button data-da="th" data-th="${v}" aria-pressed="${thm==v}" class="${thm==v?'on':''}">${t}</button></div>`).join('');
+ else if(k=='find')h=`<h3>검색</h3><input type="text" data-fq placeholder="인물·그룹·작품 이름" autocomplete="off" enterkeyhint="search" aria-label="검색어" value="${esc(fq)}"><div class="row"><button data-fs>검색</button></div><div data-fr></div>`;
+ else if(k=='share')h=`<h3>링크 공유</h3><div class="row"><button data-da="le">편집용 링크 복사</button></div>${PHOTO&&mode=='e'&&ready&&dataImgs().length?`<label>사진 ${dataImgs().length}장이 아직 문서 안에 들어 있어요. 사진 서버로 옮기면 방이 가벼워져요.</label><div class="row"><button data-da="mv">사진 서버로 옮기기</button></div>`:''}${n}<div class="row">${X}</div>`;
  else if(k=='save')h=`<h3>저장</h3><label>서버에 저장하면 「내 관계도」에 보관되며, 같은 계정으로 어디서든 열 수 있습니다.</label><input type="text" data-dt placeholder="관계도 이름" maxlength="100" value="${esc(curTitle)}">${n}<div class="row"><button data-da="srv">서버에 저장</button></div><label>파일로 저장</label><div class="row"><button data-da="fb">백업 파일</button></div><div class="row"><button data-da="fs">감상용 파일</button></div><div class="row">${X}</div>`;
  else if(k=='list')h=`<h3>내 관계도</h3>`+(myList.map(o=>`<div class="wr"><span style="flex:1;color:var(--ink)">${esc(o.title||'이름 없음')} · ${esc(String(o.saved_at||'').slice(0,10))}</span><button data-dopen="${esc(o.id)}">열기</button></div>`).join('')||'<label>저장한 관계도가 없습니다.</label>')+`${n}<div class="row"><button data-da="account">뒤로</button>${X}</div>`;
- dl.innerHTML=h}
+ dl.innerHTML=h;if(k=='find')findRender()}
+/* 검색(#dl 'find'): 철자가 들어간 인물 이름·그룹 제목·작품 제목을 찾아, 인물을 누르면 그 자리로 부드럽게 이동.
+   그룹·작품을 찾으면 거기 속한 인물을 보여 줌. 숨은 인물과(읽기 모드) 안 본 작품은 빼서 스포일러가 안 샘 */
+let fq='';
+const fn=s=>String(s||'').normalize('NFC').toLowerCase().replace(/\s+/g,'');/* 대소문자·띄어쓰기 무시 */
+function findAll(q){q=fn(q);if(!q)return null;const has=s=>fn(s).includes(q),P=S.nodes.filter(n=>n.t=='p'&&!HID.has(n.id));
+ return{people:P.filter(p=>has(p.name)),
+  groups:S.nodes.filter(c=>c.t=='c'&&c.m&&!HID.has(c.id)&&has(c.title)).map(c=>({t:c.title||'그룹',m:gKids(c).filter(p=>p.t=='p'&&!HID.has(p.id))})),
+  works:WK().filter(w=>has(w.title)&&(mode!='r'||tagIds(w).some(i=>WS.has(i)))).map(w=>({t:w.title,m:P.filter(p=>(p.tg||[]).some(i=>tagIds(w).includes(i)))}))}}
+function findRender(){const box=dl.querySelector('[data-fr]');if(!box)return;const R=findAll(fq),MAX=100;
+ const list=m=>`<div class="fl">${m.slice(0,MAX).map(p=>`<button data-fp="${esc(p.id)}">${esc(p.name||'(이름 없음)')}</button>`).join('')}</div>${m.length>MAX?`<label>외 ${m.length-MAX}명</label>`:''}`,
+  sec=(l,m)=>`<label>${l} · ${m.length}명</label>${list(m)}`;
+ box.innerHTML=!R?'<label>이름의 일부를 입력하면 인물·그룹·작품을 찾아요.</label>':
+  !(R.people.length+R.groups.length+R.works.length)?'<label>검색 결과가 없어요.</label>':
+  (R.people.length?sec('인물',R.people):'')+R.groups.map(g=>sec('그룹 '+esc(g.t),g.m)).join('')+R.works.map(w=>sec('작품 '+esc(w.t),w.m)).join('')}
+function findGo(id){const n=nd(id);if(!n||HID.has(id))return;const[x,y]=ctr(n);flyTo(x,y,1.3);const e=els[id];
+ if(e){e.classList.remove('found');void e.offsetWidth;e.classList.add('found');setTimeout(()=>e.classList.remove('found'),1800)}
+ if(innerWidth<=640)dlShow('')}/* 좁은 화면에선 검색창이 화면을 덮으므로 닫음 */
+function findEnter(){const R=findAll(fq);if(!R)return;const q=fn(fq),p=R.people.find(p=>fn(p.name)==q)||R.people[0];if(p)findGo(p.id)}/* 철자가 똑같은 인물이 먼저, 없으면 목록 첫 인물 */
+dl.addEventListener('input',e=>{if(e.target.matches('[data-fq]')){fq=e.target.value;findRender()}});
+dl.addEventListener('keydown',e=>{if(!e.target.matches('[data-fq]'))return;if(e.key=='Escape')return dlShow('');if(e.key=='Enter'&&!e.isComposing){e.preventDefault();findEnter()}});/* 한글 입력 중(조합 중) Enter 는 글자 확정이라 검색하지 않음 */
+dl.addEventListener('click',e=>{const b=e.target.closest('[data-fp],[data-fs]');if(!b)return;if(b.dataset.fp)findGo(b.dataset.fp);else findEnter()});
+$('#bsr').onclick=()=>{const on=dl.style.display=='block'&&dlKind=='find';if(!on)fq='';dlShow(on?'':'find');if(!on)dl.querySelector('[data-fq]')?.focus()};
 const EM=()=>(dl.querySelector('[data-de]').value||'').trim(),emOk=s=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s);
 dl.addEventListener('click',async e=>{const d=e.target.dataset;
  try{if(d.dopen){if(!/^[\w-]{8,64}$/.test(d.dopen))return;history.replaceState(null,'',location.pathname+location.search+'#room='+d.dopen);location.reload();return}
   const a=d.da;if(!a)return;
   if(a=='x')return dlShow('');
+  if(a=='th'){if(['light','dark','system'].includes(d.th))setTheme(d.th);return dlShow('')}
   if(a=='account')return dlShow('account');
   if(a=='mail'){const em=EM();if(!emOk(em))return dlShow('login','이메일 주소를 확인해 주세요.');
    dlShow('login','보내는 중…');await sendLink(em);return dlShow(member?'account':'login',member?'':em+' 로 로그인 링크를 보냈습니다. 메일의 링크를 누르면 이 화면으로 돌아와 로그인됩니다.')}
@@ -798,10 +1132,12 @@ dl.addEventListener('click',async e=>{const d=e.target.dataset;
   if(a=='rs'){const b=bkList()[+e.target.dataset.i];if(!b)return;let d;try{d=cleanDoc(JSON.parse(b.d))}catch(x){return dlShow('auto','이 백업을 읽을 수 없습니다.')}if(useDoc(d,false,$('#bb'),'이 백업'))dlShow('');return}
   if(a=='le'){const u=location.origin+location.pathname+'#room='+rid+'&m=e';try{await navigator.clipboard.writeText(u);dlShow('share','편집용 링크를 복사했습니다.')}catch(e){prompt('링크를 복사해 주세요',u)}return}
   if(a=='fb'||a=='fs'){dlFile(a=='fs'?'share':'backup');return}
+  if(a=='mv'){if(mode!='e')return;dlShow('share','사진을 옮기는 중…');const[n,x]=await moveImgs();dlShow('share','서버에 저장하는 중…');const s=await synced();dlShow('share',(s?n+'장을 옮겼습니다.':n+'장을 올렸지만 서버에 아직 저장되지 않았어요(남은 변경 '+(qd.length+fl.length)+'개'+(lastErr?', 서버 응답: '+lastErr:'')+'). 이 탭을 닫거나 새로고침하지 말고 잠시 기다려 주세요.')+(x?' '+x+'장은 올리지 못했어요. 다시 눌러 보세요.':''));return}
   if(a=='srv'){const t=(dl.querySelector('[data-dt]').value||'').trim()||'내 관계도';curTitle=t;dlShow('save','저장하는 중…');await saveServer(t);dlShow('save','저장했습니다. 주소창의 링크를 북마크하거나 계정 → 내 관계도에서 다시 열 수 있습니다.')}}
  catch(err){dlShow(dlKind||'login',authErr(err))}});
 $('#bs').onclick=()=>{if(!SBCFG())return dlFile('backup');if(dl.style.display=='block'&&dlKind=='save')return dlShow('');if(!member)return dlShow('login','로그인이 필요합니다.');dlShow('save')};
 $('#bb').onclick=()=>dlShow(dl.style.display=='block'&&dlKind=='auto'?'':'auto');
+$('#bth').onclick=()=>dlShow(dl.style.display=='block'&&dlKind=='theme'?'':'theme');themeUi();
 $('#ba').onclick=()=>dlShow(dl.style.display=='block'?'':member?'account':'login');
 $('#pp').onclick=e=>{if(!e.target.closest('.me'))return;const n=(prompt('표시 이름',me.name)||'').trim().slice(0,20);if(!n)return;me.name=n;lsSet('relmap_name',n);trackMe();renderOthers()};
 cv.addEventListener('pointermove',e=>{if(!room||!ready||!S.view)return;const r=cv.getBoundingClientRect(),v=S.view;

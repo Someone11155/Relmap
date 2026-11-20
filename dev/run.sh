@@ -3,8 +3,8 @@
 #          dev/run.sh collab panel     일부만 (tests/t_<이름>.py)
 # 준비물은 dev/README.md 의 '필요한 것' 참고.
 cd "$(dirname "$0")"
-NAMES=("$@"); [ ${#NAMES[@]} -eq 0 ] && NAMES=(panel overlap mode phys works watch auth collab captcha reconnect race json backup multi)
-expect(){ case "$1" in panel) echo 13;; overlap) echo 7;; mode) echo 33;; phys) echo 14;; works) echo 19;; watch) echo 29;; auth) echo 31;; collab) echo 16;; captcha) echo 10;; reconnect) echo 12;; json) echo 23;; backup) echo 13;; multi) echo 10;; *) echo "?";; esac; }
+NAMES=("$@"); [ ${#NAMES[@]} -eq 0 ] && NAMES=(panel overlap mode phys works watch auth collab captcha reconnect race json backup multi profile nest cat dark tune icon search conn cache photo rt)
+expect(){ case "$1" in panel) echo 16;; overlap) echo 10;; mode) echo 33;; phys) echo 14;; works) echo 20;; watch) echo 29;; auth) echo 31;; collab) echo 16;; captcha) echo 10;; reconnect) echo 12;; json) echo 23;; backup) echo 13;; multi) echo 13;; profile) echo 31;; nest) echo 14;; cat) echo 12;; dark) echo 20;; tune) echo 26;; icon) echo 11;; conn) echo 16;; cache) echo 11;; photo) echo 16;; rt) echo 18;; search) echo 29;; *) echo "?";; esac; }
 bash setup_db.sh >/dev/null || { echo "DB 준비 실패 — dev/README.md 의 '필요한 것'을 확인하세요"; exit 2; }
 python3 -m http.server 8765 --directory .. >/dev/null 2>&1 &
 HTTP=$!

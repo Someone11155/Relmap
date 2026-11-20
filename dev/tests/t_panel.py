@@ -40,5 +40,16 @@ with sync_playwright() as p:
     ok('10 손이 살짝(4px 이하) 흔들린 클릭은 클릭으로 처리되어 패널이 뜸',vis(pg))
     # 관계선·텍스트 클릭은 그대로
     pg.click('.lb >> nth=0');pg.wait_for_timeout(150);ok('11 관계선 라벨 클릭은 기존처럼 패널이 뜸',vis(pg))
+    # 하이라이트·선택은 인물 아이콘 원 위에서만(이름·설명 글자 영역은 마우스를 통과시킴)
+    pg.click('#cv',position={'x':200,'y':650});pg.wait_for_timeout(150);pg.mouse.move(5,5);pg.wait_for_timeout(150)
+    ib=pg.locator('.n.p[data-id="b"] .im').bounding_box();tb=pg.locator('.n.p[data-id="b"] .nm').bounding_box();tx,ty=tb['x']+10,tb['y']+tb['height']/2
+    sc=lambda:pg.eval_on_selector('.n.p[data-id="b"] .im','e=>getComputedStyle(e).transform')
+    pg.mouse.move(tx,ty);pg.wait_for_timeout(300);t1=[pg.evaluate('hov'),pg.evaluate("document.querySelectorAll('.p.dim').length"),sc()]
+    ok('12 인물 이름 글자 위에 커서를 올려도 하이라이트가 안 생김',t1[0] is None and t1[1]==0 and t1[2]=='none')
+    pg.mouse.click(tx,ty);pg.wait_for_timeout(200)
+    ok('13 인물 이름 글자를 눌러도 그 인물은 선택되지 않음(글자 아래에 있는 그룹 원 등이 눌림)',pg.evaluate('sel')!='b' and pg.evaluate("[...document.querySelectorAll('.p.sel')].length")==0)
+    pg.mouse.move(ib['x']+ib['width']/2,ib['y']+ib['height']/2);pg.wait_for_timeout(300);h2=[pg.evaluate('hov'),sc()]
+    pg.mouse.click(ib['x']+ib['width']/2,ib['y']+ib['height']/2);pg.wait_for_timeout(200)
+    ok('14 아이콘 원 위에선 하이라이트되고(확대·관계 강조), 누르면 선택됨',h2[0]=='b' and h2[1]!='none' and pg.evaluate('sel')=='b' and vis(pg))
     # 겹친 요소 번갈아 선택(기존 기능) 회귀 확인
     print('errors:',errs);b.close()

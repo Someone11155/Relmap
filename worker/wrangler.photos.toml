@@ -1,0 +1,13 @@
+# 사진 서버(photos.mjs) 배포 설정. 대시보드 붙여 넣기 대신 명령줄로 올릴 때 씀: npx wrangler deploy -c wrangler.photos.toml (설명은 worker/README.md)
+# R2 버킷 relmap-photos 는 먼저 만들어 둬야 함. 아래 두 값은 wrangler.toml 과 같은, 공개돼도 되는 값(secret / service_role 키 금지)
+name = "relmap-photos"
+main = "photos.mjs"
+compatibility_date = "2026-04-07"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "relmap-photos"
+
+[vars]
+SB_URL = ""
+SB_KEY = ""
